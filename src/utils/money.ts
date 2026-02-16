@@ -1,4 +1,4 @@
-export function convertCentsToDollars(cents: bigint ): string {
+export function convertCentsToDollars(cents: bigint): string {
     if (cents === undefined || cents === null) return "0.00";
     const negative = cents < 0n;
     const abs = negative ? -cents : cents;
