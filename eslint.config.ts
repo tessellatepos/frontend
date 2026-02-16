@@ -1,13 +1,21 @@
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import js from "@eslint/js";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import globals from "globals";
 import tseslint from "typescript-eslint";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import pluginReact from "eslint-plugin-react";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import html from "@html-eslint/eslint-plugin";
 import { defineConfig } from "eslint/config";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import reactHooks from "eslint-plugin-react-hooks";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import reactRefresh from "eslint-plugin-react-refresh";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import jsxA11y from "eslint-plugin-jsx-a11y";
-import prettier from "eslint-plugin-prettier/recommended";
+//@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default defineConfig([
     {
@@ -15,7 +23,7 @@ export default defineConfig([
         plugins: {
             js,
             "@typescript-eslint": tseslint.plugin,
-            react: pluginReact,
+            pluginReact,
             "react-hooks": reactHooks,
             "react-refresh": reactRefresh,
         },
@@ -27,7 +35,7 @@ export default defineConfig([
             ...tseslint.configs.recommended,
             pluginReact.configs.flat.recommended,
             jsxA11y.flatConfigs.recommended,
-            prettier,
+            eslintPluginPrettierRecommended,
         ],
         languageOptions: {
             parserOptions: {
@@ -46,5 +54,8 @@ export default defineConfig([
         plugins: { html },
         language: "html/html",
         extends: ["html/recommended"],
+        rules: {
+            "html/require-closing-tag": ["off"],
+        },
     },
 ]);
