@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite --host",
+        "dev": "react-router dev --host",
         "build": "tsc -b && vite build",
         "lint": "prettier . && eslint .",
         "lint:fix": "prettier . --write && eslint . --fix",
@@ -21,6 +21,7 @@
         "@radix-ui/react-collapsible": "^1.1.12",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-separator": "^1.1.8",
+        "@react-router/node": "^7.13.0",
         "@tailwindcss/vite": "^4.1.18",
         "@tessellate-pos/common": "^0.3.0-dev",
         "class-variance-authority": "^0.7.1",
@@ -32,12 +33,14 @@
         "react-router": "^7.13.0",
         "tailwind-merge": "^3.4.0",
         "tailwindcss": "^4.1.18",
-        "tslog": "^4.10.2"
+        "tslog": "^4.10.2",
+        "isbot": "^5"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.1",
         "@html-eslint/eslint-plugin": "^0.55.0",
         "@html-eslint/parser": "^0.55.0",
+        "@react-router/dev": "^7.13.0",
         "@types/eslint-plugin-jsx-a11y": "^6.10.1",
         "@types/node": "^24.10.9",
         "@types/react": "^19.2.5",
