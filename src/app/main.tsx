@@ -10,6 +10,10 @@ createRoot(document.getElementById("root")!).render(
                 path={`/storefront/`}
                 element={<Storefront />}
             />
+            <Route
+                path={`/config/`}
+                element={<Storefront />}
+            />
         </Routes>
     </BrowserRouter>,
 );

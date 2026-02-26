@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 //@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import html from "@html-eslint/eslint-plugin";
-import { defineConfig } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 //@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
 import reactHooks from "eslint-plugin-react-hooks";
 //@ts-expect-error I'm not planning on fixing these imports, doesn't cause any issues when linting
@@ -18,6 +18,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default defineConfig([
+    globalIgnores([".react-router/*"]),
     {
         files: ["**/*.{ts,mts,cts,tsx}"],
         plugins: {
