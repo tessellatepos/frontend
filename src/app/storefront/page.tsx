@@ -23,7 +23,9 @@ export default function Storefront() {
         setLoading(true);
         const backendUrl = "http://localhost:3000/";
         //L5913KTSS159H
-        const response = await fetch(`${backendUrl}items/by-location/`);
+        const response =
+            await fetch(`${backendUrl}/api/v1/items/by-location/L5913KTSS159H
+`);
         if (!response.ok) {
             throw new Error("Failed to fetch items from backend");
         }
