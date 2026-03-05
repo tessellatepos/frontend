@@ -17,6 +17,7 @@ export const CartContext = createContext<cartActionTypes | undefined>(
     undefined,
 );
 
+// TODO: migrate to zustand
 export function useCart() {
     const context = useContext(CartContext);
     if (!context) {
