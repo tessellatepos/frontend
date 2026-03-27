@@ -1,16 +1,15 @@
-import type { IConfigDevice } from "@tessellate-pos/common/src/types/database";
+import type { IConfigDevice } from "@tessellatepos/common/src/types/database";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import AddDevice from "@/app/settings/pages/devices/addDevice/addDevice.tsx";
 
 export default function Devices() {
     // configDotenv();
-    const { deviceView, setDeviceView } = useSettingsStore();
+    const { deviceView, setDeviceView, backendUrl } = useSettingsStore();
     const [deviceConfigs, setDeviceConfigs] = useState<IConfigDevice[]>([]);
 
     async function fetchDeviceConfigs() {
-        const backendURL = "http://localhost:3000/";
-        const response = await fetch(`${backendURL}api/v1/config/devices`);
+        const response = await fetch(`${backendUrl}/api/v1/config/devices`);
 
         if (!response.ok) {
             throw new Error(

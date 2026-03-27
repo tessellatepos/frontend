@@ -1,16 +1,14 @@
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useEffect, useState } from "react";
-import type { IConfigDevice } from "@tessellate-pos/common/src/types/database.ts";
+import type { IConfigDevice } from "@tessellatepos/common/src/types/database.ts";
 
 export default function AddDevice() {
-    const { setDeviceView } = useSettingsStore();
-    const backendURL = "http://localhost:3000/";
-
+    const { setDeviceView, backendUrl } = useSettingsStore();
     const [deviceConfig, setDeviceConfig] = useState<IConfigDevice>();
 
     async function cancelPairing(deviceID: string) {
         await fetch(
-            `${backendURL}api/v1/config/devices/pair-device/${deviceID}`,
+            `${backendUrl}/api/v1/config/devices/pair-device/${deviceID}`,
             {
                 method: "DELETE",
             },
@@ -20,7 +18,7 @@ export default function AddDevice() {
 
     async function fetchDeviceConfigs() {
         const response = await fetch(
-            `${backendURL}api/v1/config/devices/pair-device/`,
+            `${backendUrl}/api/v1/config/devices/pair-device/`,
         );
 
         if (!response.ok) {

@@ -8,6 +8,10 @@ interface SettingsState {
     setView: (view: SettingsView) => void;
     deviceView: DeviceView;
     setDeviceView: (view: DeviceView) => void;
+    locationId: string;
+    setLocationId: (locationId: string) => void;
+    backendUrl: string;
+    setBackendURL: (backendUrl: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -15,4 +19,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     setView: (view) => set({ view }),
     deviceView: "list",
     setDeviceView: (deviceView) => set({ deviceView }),
+    locationId: "",
+    setLocationId: (locationId) => set({ locationId }),
+    backendUrl: "http://localhost:3000",
+    setBackendURL: (backendURL) => set({ backendUrl: backendURL }),
 }));
