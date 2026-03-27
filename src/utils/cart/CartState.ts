@@ -1,5 +1,5 @@
-import type { Cart } from "@tessellate-pos/common/src/core/cart.ts";
-import type { cartItem } from "@tessellate-pos/common/src/types/universalTypes.ts";
+import type { Cart } from "@tessellatepos/common/src/core/cart.ts";
+import type { cartItem } from "@tessellatepos/common/src/types/universalTypes.ts";
 import { Logger } from "tslog";
 
 export interface CartState {

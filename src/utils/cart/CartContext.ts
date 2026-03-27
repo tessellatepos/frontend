@@ -1,5 +1,5 @@
 import { createContext, type Dispatch, useContext } from "react";
-import type { cartItem } from "@tessellate-pos/common/src/types/universalTypes.ts";
+import type { cartItem } from "@tessellatepos/common/src/types/universalTypes.ts";
 import { type CartAction, type CartState } from "@/utils/cart/CartState.ts";
 
 type cartActionTypes = {

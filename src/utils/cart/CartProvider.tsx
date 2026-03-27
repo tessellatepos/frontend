@@ -1,8 +1,8 @@
 import { type ReactNode, useReducer } from "react";
 import { CartContext } from "@/utils/cart/CartContext.ts";
-import type { cartItem } from "@tessellate-pos/common/src/types/universalTypes.ts";
+import type { cartItem } from "@tessellatepos/common/src/types/universalTypes.ts";
 import { cartReducer } from "@/utils/cart/CartState.ts";
-import { Cart as CartBase } from "@tessellate-pos/common/src/core/cart.ts";
+import { Cart as CartBase } from "@tessellatepos/common/src/core/cart.ts";
 import { Logger } from "tslog";
 
 const logger = new Logger();
