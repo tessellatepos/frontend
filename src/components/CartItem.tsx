@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { convertCentsToDollars } from "@/utils/money.ts";
-import type { squareCartItem } from "@tessellate-pos/common/src/types/squareTypes";
+import type { squareCartItem } from "@tessellatepos/common/src/types/squareTypes";
 import { useCart } from "@/utils/cart/CartContext.ts";
 
 type Props = {

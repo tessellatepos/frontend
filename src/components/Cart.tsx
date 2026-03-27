@@ -1,20 +1,23 @@
 import CartItem from "@/components/CartItem";
 import { Button } from "@/components/ui/button";
-import type { squareCartItem } from "@tessellate-pos/common/src/types/squareTypes";
+import type { squareCartItem } from "@tessellatepos/common/src/types/squareTypes";
 import { convertCentsToDollars } from "@/utils/money.ts";
-//import { Logger } from "@origranot/ts-logger";
 import { useCart } from "@/utils/cart/CartContext.ts";
 import { useEffect } from "react";
-
-//const logger = new Logger({transports: [new ConsoleTransport()]});
+import { useNavigate } from "react-router";
 
 export default function Cart() {
     const { getItems, getTotal, clearCart } = useCart();
+    const navigate = useNavigate();
     const total = getTotal();
 
     useEffect(() => {
         console.log("Cart total changed:", convertCentsToDollars(total));
     }, [total]);
+
+    const createOrder = () => {
+        navigate("/storefront/cart");
+    };
 
     return (
         <div className="bg-gray-200 w-full h-full flex flex-col">
@@ -43,7 +46,8 @@ export default function Cart() {
                 <Button
                     className="bg-blue-600 p-8 text-xl"
                     size="lg"
-                    variant="default">
+                    variant="default"
+                    onClick={createOrder}>
                     Checkout
                 </Button>
             </div>

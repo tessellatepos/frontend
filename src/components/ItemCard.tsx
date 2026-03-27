@@ -8,7 +8,7 @@ import {
 import type {
     squareCartItem,
     squareItemVariation,
-} from "@tessellate-pos/common/src/types/squareTypes";
+} from "@tessellatepos/common/src/types/squareTypes";
 import { convertCentsToDollars } from "@/utils/money.ts";
 import {
     Dialog,
@@ -20,7 +20,7 @@ import { useCart } from "@/utils/cart/CartContext.ts";
 import type {
     cartItem,
     item,
-} from "@tessellate-pos/common/src/types/universalTypes.ts";
+} from "@tessellatepos/common/src/types/universalTypes.ts";
 
 type Props = {
     item?: cartItem;
@@ -70,32 +70,32 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
                         variant="outline"
                         className="flex flex-col h-full">
                         <ItemHeader className={`w-full`}>
-                            {parentItem?.imageURLs &&
-                            parentItem?.imageURLs?.length > 0 ? (
-                                <div className={`w-full aspect-square`}>
-                                    <img
-                                        src={parentItem.imageURLs[0]}
-                                        alt={`${parentItem?.name} Selectable Card`}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                </div>
-                            ) : (
-                                <div className={`w-full aspect-square`}>
-                                    <img
-                                        src={placeholderImage}
-                                        alt={`${parentItem?.name} Selectable Card`}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                </div>
-                            )}
+                            {/*{parentItem?.imageURLs &&*/}
+                            {/*parentItem?.imageURLs?.length > 0 ? (*/}
+                            {/*    <div className={`w-full aspect-square`}>*/}
+                            {/*        <img*/}
+                            {/*            src={parentItem.imageURLs[0]}*/}
+                            {/*            alt={`${parentItem?.name} Selectable Card`}*/}
+                            {/*            style={{*/}
+                            {/*                width: "100%",*/}
+                            {/*                height: "100%",*/}
+                            {/*                objectFit: "cover",*/}
+                            {/*            }}*/}
+                            {/*        />*/}
+                            {/*    </div>*/}
+                            {/*) : (*/}
+                            {/*    <div className={`w-full aspect-square`}>*/}
+                            {/*        <img*/}
+                            {/*            src={placeholderImage}*/}
+                            {/*            alt={`${parentItem?.name} Selectable Card`}*/}
+                            {/*            style={{*/}
+                            {/*                width: "100%",*/}
+                            {/*                height: "100%",*/}
+                            {/*                objectFit: "cover",*/}
+                            {/*            }}*/}
+                            {/*        />*/}
+                            {/*    </div>*/}
+                            {/*)}*/}
                         </ItemHeader>
                         <ItemContent className="flex-1 flex flex-col justify-between h-16">
                             <ItemTitle
@@ -147,6 +147,9 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
             titleText = item.parent?.name ?? "Item Missing Title";
         }
 
+        void imageSrc;
+        void placeholderImage;
+
         return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events
             <div
@@ -159,32 +162,32 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
                     variant="outline"
                     className="flex flex-col h-full">
                     <ItemHeader>
-                        {imageSrc ? (
-                            <div
-                                style={{ width: "100%", aspectRatio: "1 / 1" }}>
-                                <img
-                                    src={imageSrc}
-                                    alt={`${titleText} Item Card`}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div className={`w-full aspect-square`}>
-                                <img
-                                    src={placeholderImage}
-                                    alt={`${parentItem?.name} Selectable Card`}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                    }}
-                                />
-                            </div>
-                        )}
+                        {/*{imageSrc ? (*/}
+                        {/*    <div*/}
+                        {/*        style={{ width: "100%", aspectRatio: "1 / 1" }}>*/}
+                        {/*        <img*/}
+                        {/*            src={imageSrc}*/}
+                        {/*            alt={`${titleText} Item Card`}*/}
+                        {/*            style={{*/}
+                        {/*                width: "100%",*/}
+                        {/*                height: "100%",*/}
+                        {/*                objectFit: "cover",*/}
+                        {/*            }}*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*) : (*/}
+                        {/*    <div className={`w-full aspect-square`}>*/}
+                        {/*        <img*/}
+                        {/*            src={placeholderImage}*/}
+                        {/*            alt={`${parentItem?.name} Selectable Card`}*/}
+                        {/*            style={{*/}
+                        {/*                width: "100%",*/}
+                        {/*                height: "100%",*/}
+                        {/*                objectFit: "cover",*/}
+                        {/*            }}*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*)}*/}
                     </ItemHeader>
                     <ItemContent>
                         <ItemTitle className="text-2xl line-clamp-2 items-start h-16 text-balance">
