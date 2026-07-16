@@ -1,15 +1,15 @@
 import CartItem from "@/components/CartItem";
 import { Button } from "@/components/ui/button";
-import type { squareCartItem } from "@tessellatepos/common/src/types/squareTypes";
+import type { CartItem as CartItemType } from "@tessellatepos/sdk";
 import { convertCentsToDollars } from "@/utils/money.ts";
-import { useCart } from "@/utils/cart/CartContext.ts";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 export default function Cart() {
-    const { getItems, getTotal, clearCart } = useCart();
+    const { cart, clearCart } = useCartStore();
     const navigate = useNavigate();
-    const total = getTotal();
+    const total = cart.getTotal();
 
     useEffect(() => {
         console.log("Cart total changed:", convertCentsToDollars(total));
@@ -23,7 +23,7 @@ export default function Cart() {
         <div className="bg-gray-200 w-full h-full flex flex-col">
             <div className="flex-1 overflow-auto overscroll-auto no-scrollbar p-3">
                 <div className="space-y-1">
-                    {getItems().map((item: squareCartItem) => (
+                    {cart.getItems().map((item: CartItemType) => (
                         <div
                             key={item.itemId ?? item.name}
                             className="w-full">

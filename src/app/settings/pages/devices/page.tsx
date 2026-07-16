@@ -1,4 +1,4 @@
-import type { IConfigDevice } from "@tessellatepos/common/src/types/database";
+import type { IConfigDevice } from "@tessellatepos/common";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import AddDevice from "@/app/settings/pages/devices/addDevice/addDevice.tsx";

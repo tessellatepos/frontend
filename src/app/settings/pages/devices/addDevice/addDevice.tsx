@@ -1,6 +1,6 @@
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useEffect, useState } from "react";
-import type { IConfigDevice } from "@tessellatepos/common/src/types/database.ts";
+import type { IConfigDevice } from "@tessellatepos/common";
 
 export default function AddDevice() {
     const { setDeviceView, backendUrl } = useSettingsStore();

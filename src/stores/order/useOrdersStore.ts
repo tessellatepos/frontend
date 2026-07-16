@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import type { squareDiscount } from "@tessellatepos/common/src/types/squareTypes.ts";
+import type { Discount } from "@tessellatepos/sdk";
 
 interface OrdersState {
-    discounts: squareDiscount[];
-    setDiscounts: (discounts: squareDiscount[]) => void;
+    discounts: Discount[];
+    setDiscounts: (discounts: Discount[]) => void;
 }
 
 export const useOrdersStore = create<OrdersState>((set) => ({

@@ -1,13 +1,10 @@
 import CartItem from "@/components/CartItem";
-import { useCart } from "@/utils/cart/CartContext";
-import type {
-    squareCartItem,
-    squareOrder,
-} from "@tessellatepos/common/src/types/squareTypes";
+import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
 import { useEffect, useState } from "react";
 import { Logger } from "tslog";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useOrdersStore } from "@/stores/order/useOrdersStore.ts";
+import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 const logger = new Logger();
 
@@ -15,11 +12,10 @@ export default function CartPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
-    const [order, setOrder] = useState<squareOrder>();
-    const { locationId, backendUrl } = useSettingsStore();
+    const [order, setOrder] = useState<Order>();
+    const { locationId, backendUrl, deviceId } = useSettingsStore();
     const { discounts } = useOrdersStore();
-
-    const { getItems } = useCart();
+    const { cart } = useCartStore();
 
     async function updateOrderStatus() {
         console.log(backendUrl, loading, error, order, errorMessage);
@@ -27,10 +23,15 @@ export default function CartPage() {
 
     async function createOrder() {
         setLoading(true);
-        const order: squareOrder = {
-            lineItems: getItems(),
+        const order: Order = {
+            lineItems: cart.getItems(),
             locationId,
             discounts,
+            //TODO remove development reference/indempotency key
+            referenceId: "542d6eb3-9c54-4a31-a1f5-b5249144163d",
+            source: {
+                name: `Tessellate POS - From Device:${deviceId}`,
+            },
         };
         const response = await fetch(`${backendUrl}/api/v1/orders/create`, {
             method: "POST",
@@ -45,7 +46,7 @@ export default function CartPage() {
             setError(true);
             setErrorMessage(eMessage);
         } else {
-            const orderRes: squareOrder = await response.json();
+            const orderRes: Order = await response.json();
 
             logger.debug("Fetched Order:", orderRes);
 
@@ -71,7 +72,7 @@ export default function CartPage() {
             <div>
                 {order &&
                     order.lineItems &&
-                    order.lineItems.map((item: squareCartItem) => (
+                    order.lineItems.map((item: CartItemType) => (
                         <div key={item.itemId ?? item.name}>
                             <CartItem item={item} />
                         </div>

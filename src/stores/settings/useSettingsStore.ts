@@ -12,6 +12,8 @@ interface SettingsState {
     setLocationId: (locationId: string) => void;
     backendUrl: string;
     setBackendURL: (backendUrl: string) => void;
+    deviceId: string;
+    setDeviceId: (deviceId: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -23,4 +25,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     setLocationId: (locationId) => set({ locationId }),
     backendUrl: "http://localhost:3000",
     setBackendURL: (backendURL) => set({ backendUrl: backendURL }),
+    deviceId: "",
+    setDeviceId: (deviceId) => set({ deviceId }),
 }));
