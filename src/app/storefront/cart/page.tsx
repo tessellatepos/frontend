@@ -27,8 +27,7 @@ export default function CartPage() {
             lineItems: cart.getItems(),
             locationId,
             discounts,
-            //TODO remove development reference/indempotency key
-            referenceId: "542d6eb3-9c54-4a31-a1f5-b5249144163d",
+            referenceId: crypto.randomUUID(),
             source: {
                 name: `Tessellate POS - From Device:${deviceId}`,
             },
