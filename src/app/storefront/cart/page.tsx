@@ -1,6 +1,6 @@
 import CartItem from "@/components/CartItem";
 import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Logger } from "tslog";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useOrdersStore } from "@/stores/order/useOrdersStore.ts";
@@ -21,13 +21,14 @@ export default function CartPage() {
         console.log(backendUrl, loading, error, order, errorMessage);
     }
 
-    async function createOrder() {
+    const createOrder = useCallback(async () => {
         setLoading(true);
         const order: Order = {
             lineItems: cart.getItems(),
             locationId,
             discounts,
-            referenceId: crypto.randomUUID(),
+            //TODO remove development reference/indempotency key
+            referenceId: "542d6eb3-9c54-4a31-a1f5-b5249144163d",
             source: {
                 name: `Tessellate POS - From Device:${deviceId}`,
             },
@@ -57,14 +58,14 @@ export default function CartPage() {
                 throw new Error("No order found in backend response");
             }
         }
-    }
+    }, [cart, locationId, discounts, deviceId, backendUrl]);
 
     useEffect(() => {
         const doFetch = async () => {
             await createOrder();
         };
         void doFetch();
-    }, []);
+    }, [createOrder]);
 
     return (
         <div>
