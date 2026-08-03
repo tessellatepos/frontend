@@ -6,9 +6,10 @@ import {
     ItemTitle,
 } from "@/components/ui/item";
 import type {
-    squareCartItem,
-    squareItemVariation,
-} from "@tessellate-pos/common/src/types/squareTypes";
+    CartItem as CartItemType,
+    ItemVariation as ItemVariationType,
+    Item as ItemType,
+} from "@tessellatepos/sdk";
 import { convertCentsToDollars } from "@/utils/money.ts";
 import {
     Dialog,
@@ -16,42 +17,38 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog.tsx";
 import placeholderImage from "@/components/ui/no_image.webp";
-import { useCart } from "@/utils/cart/CartContext.ts";
-import type {
-    cartItem,
-    item,
-} from "@tessellate-pos/common/src/types/universalTypes.ts";
+import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 type Props = {
-    item?: cartItem;
-    parentItem?: item;
+    item?: CartItemType;
+    parentItem?: ItemType;
     className?: string;
 };
 
 type ItemVariationProps = {
-    item?: cartItem;
+    item?: CartItemType;
     className?: string;
-    parent?: item;
+    parent?: ItemType;
     variationIndex?: number;
 };
 
 type ParentItemCardProps = {
-    parentItem: item;
+    parentItem: ItemType;
     className?: string;
 };
 
 export default function ItemCard({ item, parentItem, className = "" }: Props) {
-    const { addQuantity } = useCart();
-    const convertParentToCartItems = (parent: item): cartItem[] => {
+    const { addQuantity } = useCartStore();
+    const convertParentToCartItems = (parent: ItemType): CartItemType[] => {
         return (
             parent?.variations?.map(
-                (variation: squareItemVariation, index: number) => {
+                (variation: ItemVariationType, index: number) => {
                     return {
                         ...variation,
                         itemId: variation.itemId,
                         imageURL: parent?.imageURLs?.[index] ?? "",
                         parent: { id: parent.id, name: parent.name },
-                    } as squareCartItem;
+                    } as CartItemType;
                 },
             ) || []
         );
@@ -147,13 +144,16 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
             titleText = item.parent?.name ?? "Item Missing Title";
         }
 
+        void imageSrc;
+        void placeholderImage;
+
         return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events
             <div
                 role="button"
                 tabIndex={0}
                 aria-label={`Add ${titleText} to cart`}
-                onClick={() => addQuantity(item as cartItem)}
+                onClick={() => addQuantity(item as CartItemType)}
                 className={`cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 ${className}`}>
                 <Item
                     variant="outline"

@@ -9,15 +9,15 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { convertCentsToDollars } from "@/utils/money.ts";
-import type { squareCartItem } from "@tessellate-pos/common/src/types/squareTypes";
-import { useCart } from "@/utils/cart/CartContext.ts";
+import type { CartItem as CartItemType } from "@tessellatepos/sdk";
+import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 type Props = {
-    item: squareCartItem;
+    item: CartItemType;
 };
 
 export default function CartItem({ item }: Props) {
-    const { addQuantity, removeQuantity, removeItem } = useCart();
+    const { removeQuantity, removeItem, addQuantity } = useCartStore();
 
     return (
         <div className="flex w-full">
