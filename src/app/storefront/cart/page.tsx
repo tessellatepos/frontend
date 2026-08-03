@@ -1,9 +1,14 @@
 import CartItem from "@/components/CartItem";
+import PaymentMethodPanel from "@/components/PaymentMethodPanel";
 import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Logger } from "tslog";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
-import { useOrdersStore } from "@/stores/order/useOrdersStore.ts";
+import {
+    useOrdersStore,
+    type PaymentMethod,
+} from "@/stores/order/useOrdersStore.ts";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 const logger = new Logger();
@@ -14,12 +19,22 @@ export default function CartPage() {
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [order, setOrder] = useState<Order>();
     const { locationId, backendUrl, deviceId } = useSettingsStore();
-    const { discounts } = useOrdersStore();
-    const { cart } = useCartStore();
+    const { discounts, setCompletedOrder } = useOrdersStore();
+    const { cart, clearCart } = useCartStore();
+    const navigate = useNavigate();
 
-    async function updateOrderStatus() {
-        console.log(backendUrl, loading, error, order, errorMessage);
-    }
+    const handlePaid = useCallback(
+        (
+            paidOrder: Order,
+            method: PaymentMethod,
+            changeDueCents?: bigint | null,
+        ) => {
+            setCompletedOrder(paidOrder, method, changeDueCents);
+            clearCart();
+            void navigate("/storefront/receipt");
+        },
+        [setCompletedOrder, clearCart, navigate],
+    );
 
     const createOrder = useCallback(async () => {
         setLoading(true);
@@ -99,9 +114,20 @@ export default function CartPage() {
                     {order && order.totalMoney && order.totalMoney.amount}
                 </p>
             </div>
-            <div>
-                <button onClick={() => updateOrderStatus()}>Credit Card</button>
-            </div>
+            {error && (
+                <div>
+                    <p>{errorMessage}</p>
+                    <button onClick={() => void createOrder()}>Retry</button>
+                </div>
+            )}
+            {loading && !error && <p>Creating order…</p>}
+            {order && order.id && !loading && !error && (
+                <PaymentMethodPanel
+                    order={order}
+                    backendUrl={backendUrl}
+                    onPaid={handlePaid}
+                />
+            )}
         </div>
     );
 }
