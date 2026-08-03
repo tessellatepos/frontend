@@ -7,6 +7,7 @@ export default [
     layout("app/storefront/layout.tsx", [
         route("storefront/:deviceId", "app/storefront/page.tsx"),
         route("storefront/cart", "app/storefront/cart/page.tsx"),
+        route("storefront/receipt", "app/storefront/receipt/page.tsx"),
     ]),
     route("*?", "app/getting-started/page.tsx"),
 ] satisfies RouteConfig;
