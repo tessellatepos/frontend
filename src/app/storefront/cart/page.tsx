@@ -4,6 +4,10 @@ import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Logger } from "tslog";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { convertCentsToDollars } from "@tessellatepos/sdk";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import {
     useOrdersStore,
@@ -57,9 +61,9 @@ export default function CartPage() {
         });
 
         if (response.status != 200) {
-            const eMessage: string = await response.json();
+            const body: { message?: string } = await response.json();
             setError(true);
-            setErrorMessage(eMessage);
+            setErrorMessage(body?.message ?? "Failed to create order");
         } else {
             const orderRes: Order = await response.json();
 
@@ -76,58 +80,100 @@ export default function CartPage() {
     }, [cart, locationId, discounts, deviceId, backendUrl]);
 
     useEffect(() => {
+        // Only create the order once, from the cart as it stood on mount —
+        // `createOrder` gets a new identity when the cart is cleared after
+        // payment (see handlePaid), and re-running this then would submit
+        // an empty-cart order while we're navigating to the receipt.
         const doFetch = async () => {
             await createOrder();
         };
         void doFetch();
-    }, [createOrder]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
-        <div>
-            <div>
-                {order &&
-                    order.lineItems &&
-                    order.lineItems.map((item: CartItemType) => (
-                        <div key={item.itemId ?? item.name}>
-                            <CartItem item={item} />
+        <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 p-6 md:grid-cols-[3fr_2fr]">
+                <section className="flex flex-col gap-4">
+                    <h1 className="text-2xl font-semibold">Checkout</h1>
+
+                    {loading && !error && (
+                        <div className="flex items-center justify-center gap-2 rounded-lg bg-white p-8 text-gray-500 shadow-sm dark:bg-gray-800">
+                            <Spinner />
+                            <span>Creating order…</span>
                         </div>
-                    ))}
+                    )}
+
+                    {error && (
+                        <div className="flex flex-col gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                            <p>{errorMessage || "Failed to create order."}</p>
+                            <Button
+                                variant="destructive"
+                                className="w-fit"
+                                onClick={() => void createOrder()}>
+                                Retry
+                            </Button>
+                        </div>
+                    )}
+
+                    {order && !loading && !error && (
+                        <div className="flex flex-col divide-y divide-gray-200 rounded-lg bg-white shadow-sm dark:divide-gray-700 dark:bg-gray-800">
+                            {order.lineItems?.map((item: CartItemType) => (
+                                <div
+                                    key={item.itemId ?? item.name}
+                                    className="p-2">
+                                    <CartItem item={item} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                <aside className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2 rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
+                        <h2 className="text-lg font-medium">Order Summary</h2>
+                        <Separator />
+                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
+                            <span>Subtotal</span>
+                            <span>
+                                $
+                                {convertCentsToDollars(
+                                    order?.netAmount?.totalMoney?.amount ?? 0n,
+                                )}
+                            </span>
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
+                            <span>Tax</span>
+                            <span>
+                                $
+                                {convertCentsToDollars(
+                                    order?.netAmount?.taxMoney?.amount ?? 0n,
+                                )}
+                            </span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between text-xl font-semibold">
+                            <span>Total</span>
+                            <span>
+                                $
+                                {convertCentsToDollars(
+                                    order?.totalMoney?.amount ?? 0n,
+                                )}
+                            </span>
+                        </div>
+                    </div>
+
+                    {order && order.id && !loading && !error && (
+                        <div className="rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
+                            <PaymentMethodPanel
+                                order={order}
+                                backendUrl={backendUrl}
+                                onPaid={handlePaid}
+                            />
+                        </div>
+                    )}
+                </aside>
             </div>
-            <div>
-                <p>
-                    Subtotal:
-                    {order &&
-                        order.netAmount &&
-                        order.netAmount &&
-                        order.netAmount.totalMoney &&
-                        order.netAmount.totalMoney.amount}
-                </p>
-                <p>
-                    Tax Amount:
-                    {order &&
-                        order.netAmount &&
-                        order.netAmount?.taxMoney &&
-                        order.netAmount?.taxMoney.amount}
-                </p>
-                <p>
-                    Total:
-                    {order && order.totalMoney && order.totalMoney.amount}
-                </p>
-            </div>
-            {error && (
-                <div>
-                    <p>{errorMessage}</p>
-                    <button onClick={() => void createOrder()}>Retry</button>
-                </div>
-            )}
-            {loading && !error && <p>Creating order…</p>}
-            {order && order.id && !loading && !error && (
-                <PaymentMethodPanel
-                    order={order}
-                    backendUrl={backendUrl}
-                    onPaid={handlePaid}
-                />
-            )}
         </div>
     );
 }

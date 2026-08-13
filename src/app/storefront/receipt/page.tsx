@@ -1,9 +1,12 @@
 import type { CartItem as CartItemType } from "@tessellatepos/sdk";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { convertCentsToDollars } from "@/utils/money.ts";
+import { Separator } from "@/components/ui/separator";
+import { convertCentsToDollars } from "@tessellatepos/sdk";
 import { useOrdersStore } from "@/stores/order/useOrdersStore.ts";
+import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 
 const PAYMENT_METHOD_LABEL: Record<string, string> = {
     CASH: "Cash",
@@ -18,68 +21,111 @@ export default function ReceiptPage() {
         changeDueCents,
         clearCompletedOrder,
     } = useOrdersStore();
+    const { deviceId } = useSettingsStore();
     const navigate = useNavigate();
+    const storefrontPath = deviceId ? `/storefront/${deviceId}` : "/storefront";
 
     // No completed order in state (e.g. page refresh) — nothing to show.
     useEffect(() => {
-        if (!completedOrder) void navigate("/storefront");
-    }, [completedOrder, navigate]);
+        if (!completedOrder) void navigate(storefrontPath);
+    }, [completedOrder, navigate, storefrontPath]);
 
     if (!completedOrder) return null;
 
     function handleNewOrder() {
         clearCompletedOrder();
-        void navigate("/storefront");
+        void navigate(storefrontPath);
     }
 
     return (
-        <div>
-            <h1>Order Confirmed</h1>
-            <p>Order #{completedOrder.id ?? completedOrder.referenceId}</p>
-
-            <div>
-                {completedOrder.lineItems?.map((item: CartItemType) => (
-                    <p key={item.itemId ?? item.name}>
-                        {item.quantity?.toString()}×{" "}
-                        {item.parent?.name ?? item.name}
+        <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 p-6 dark:bg-gray-900">
+            <div className="flex w-full max-w-md flex-col gap-4 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <CheckCircle2 className="size-10 text-green-500" />
+                    <h1 className="text-2xl font-semibold">Order Confirmed</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Order #{completedOrder.id ?? completedOrder.referenceId}
                     </p>
-                ))}
-            </div>
+                </div>
 
-            <div>
-                <p>
-                    Subtotal: $
-                    {convertCentsToDollars(
-                        completedOrder.netAmount?.totalMoney?.amount ?? 0n,
-                    )}
-                </p>
-                <p>
-                    Tax: $
-                    {convertCentsToDollars(
-                        completedOrder.netAmount?.taxMoney?.amount ?? 0n,
-                    )}
-                </p>
-                <p>
-                    Total: $
-                    {convertCentsToDollars(
-                        completedOrder.totalMoney?.amount ?? 0n,
-                    )}
-                </p>
-                <p>
-                    Payment method:{" "}
-                    {paymentMethod
-                        ? (PAYMENT_METHOD_LABEL[paymentMethod] ?? paymentMethod)
-                        : "Unknown"}
-                </p>
-                {paymentMethod === "CASH" && changeDueCents !== null && (
-                    <p>
-                        Change due: $
-                        {convertCentsToDollars(changeDueCents ?? 0n)}
-                    </p>
-                )}
-            </div>
+                <Separator />
 
-            <Button onClick={handleNewOrder}>New Order</Button>
+                <div className="flex flex-col gap-1">
+                    {completedOrder.lineItems?.map((item: CartItemType) => (
+                        <div
+                            key={item.itemId ?? item.name}
+                            className="flex justify-between text-sm">
+                            <span>
+                                {item.quantity?.toString()}×{" "}
+                                {item.parent?.name ?? item.name}
+                            </span>
+                            <span>
+                                $
+                                {convertCentsToDollars(
+                                    item.priceMoney?.amount ?? 0n,
+                                )}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex justify-between">
+                        <span>Subtotal</span>
+                        <span>
+                            $
+                            {convertCentsToDollars(
+                                completedOrder.netAmount?.totalMoney?.amount ??
+                                    0n,
+                            )}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Tax</span>
+                        <span>
+                            $
+                            {convertCentsToDollars(
+                                completedOrder.netAmount?.taxMoney?.amount ??
+                                    0n,
+                            )}
+                        </span>
+                    </div>
+                    <div className="flex justify-between text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <span>Total</span>
+                        <span>
+                            $
+                            {convertCentsToDollars(
+                                completedOrder.totalMoney?.amount ?? 0n,
+                            )}
+                        </span>
+                    </div>
+                    <div className="flex justify-between pt-1">
+                        <span>Payment method</span>
+                        <span>
+                            {paymentMethod
+                                ? (PAYMENT_METHOD_LABEL[paymentMethod] ??
+                                  paymentMethod)
+                                : "Unknown"}
+                        </span>
+                    </div>
+                    {paymentMethod === "CASH" && changeDueCents !== null && (
+                        <div className="flex justify-between">
+                            <span>Change due</span>
+                            <span>
+                                ${convertCentsToDollars(changeDueCents ?? 0n)}
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                <Button
+                    className="mt-2 p-6 text-lg"
+                    onClick={handleNewOrder}>
+                    New Order
+                </Button>
+            </div>
         </div>
     );
 }
