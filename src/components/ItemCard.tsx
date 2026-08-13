@@ -10,7 +10,7 @@ import type {
     ItemVariation as ItemVariationType,
     Item as ItemType,
 } from "@tessellatepos/sdk";
-import { convertCentsToDollars } from "@/utils/money.ts";
+import { convertCentsToDollars } from "@tessellatepos/sdk";
 import {
     Dialog,
     DialogContent,
@@ -41,16 +41,14 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
     const { addQuantity } = useCartStore();
     const convertParentToCartItems = (parent: ItemType): CartItemType[] => {
         return (
-            parent?.variations?.map(
-                (variation: ItemVariationType, index: number) => {
-                    return {
-                        ...variation,
-                        itemId: variation.itemId,
-                        imageURL: parent?.imageURLs?.[index] ?? "",
-                        parent: { id: parent.id, name: parent.name },
-                    } as CartItemType;
-                },
-            ) || []
+            parent?.variations?.map((variation: ItemVariationType) => {
+                return {
+                    ...variation,
+                    itemId: variation.itemId,
+                    imageURL: parent?.image ?? "",
+                    parent: { id: parent.id, name: parent.name },
+                } as CartItemType;
+            }) || []
         );
     };
 
@@ -67,11 +65,10 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
                         variant="outline"
                         className="flex flex-col h-full">
                         <ItemHeader className={`w-full`}>
-                            {parentItem?.imageURLs &&
-                            parentItem?.imageURLs?.length > 0 ? (
+                            {parentItem?.image ? (
                                 <div className={`w-full aspect-square`}>
                                     <img
-                                        src={parentItem.imageURLs[0]}
+                                        src={parentItem.image}
                                         alt={`${parentItem?.name} Selectable Card`}
                                         style={{
                                             width: "100%",
@@ -132,12 +129,11 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
         parent,
         variationIndex,
     }: ItemVariationProps) {
-        const imageSrc =
-            item?.imageURL ?? parent?.imageURLs?.[variationIndex ?? 0] ?? "";
+        const imageSrc = item?.imageURL ?? parent?.image ?? "";
         let titleText = item?.name ?? parent?.name ?? "item";
 
-        if (variationIndex == 0 && parent?.buyerFacingName) {
-            titleText = parent.buyerFacingName;
+        if (variationIndex == 0 && parent?.displayName) {
+            titleText = parent.displayName;
         }
 
         if (item?.name == "") {
@@ -191,7 +187,7 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
                             {titleText}
                         </ItemTitle>
                         <ItemDescription className="text-xl text-black text-center">
-                            {item?.pricingType === "FIXED_PRICING" &&
+                            {item?.pricingType === "FIXED" &&
                             item.priceMoney?.amount
                                 ? `$${convertCentsToDollars(item.priceMoney.amount)}`
                                 : "Price varies"}

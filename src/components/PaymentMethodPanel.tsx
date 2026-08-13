@@ -12,7 +12,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
-import { convertCentsToDollars, toBigIntAmount } from "@/utils/money.ts";
+import { convertCentsToDollars, toBigIntAmount } from "@tessellatepos/sdk";
 import type { PaymentMethod } from "@/stores/order/useOrdersStore.ts";
 
 const logger = new Logger();

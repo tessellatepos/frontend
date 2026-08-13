@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { convertCentsToDollars } from "@/utils/money.ts";
+import { convertCentsToDollars } from "@tessellatepos/sdk";
 import type { CartItem as CartItemType } from "@tessellatepos/sdk";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
@@ -31,7 +31,7 @@ export default function CartItem({ item }: Props) {
                             <div
                                 className={`flex flex-row justify-start items-start`}>
                                 <ItemTitle className="text-xl">
-                                    {item?.pricingType === "FIXED_PRICING" &&
+                                    {item?.pricingType === "FIXED" &&
                                     item.priceMoney?.amount ? (
                                         <>
                                             $

@@ -100,7 +100,7 @@ export default function Storefront() {
                                     const cartItem: CartItem = {
                                         ...v,
                                         itemId: v.itemId,
-                                        imageURL: item.imageURLs?.[0] ?? "",
+                                        imageURL: item.image ?? "",
                                         parent: {
                                             id: item.id,
                                             name: item.name,

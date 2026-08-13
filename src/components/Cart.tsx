@@ -1,7 +1,7 @@
 import CartItem from "@/components/CartItem";
 import { Button } from "@/components/ui/button";
 import type { CartItem as CartItemType } from "@tessellatepos/sdk";
-import { convertCentsToDollars } from "@/utils/money.ts";
+import { convertCentsToDollars } from "@tessellatepos/sdk";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
