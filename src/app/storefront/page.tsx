@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { CartItem, Item } from "@tessellatepos/sdk";
-import type { IConfigDevice } from "@tessellatepos/common";
+import type { IConfigDevice } from "@tessellatepos/sdk";
 // import { configDotenv } from "dotenv";
 import { Logger } from "tslog";
 import ItemCard from "@/components/ItemCard.tsx";
