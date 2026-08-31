@@ -43,7 +43,34 @@ export default function AddDevice() {
             await fetchDeviceConfigs();
         };
         void doFetch();
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // The mobile app completes pairing by hitting PUT /pair-device/:code on
+    // the backend. Poll this device until paired_at is set, then close the
+    // pairing window automatically.
+    useEffect(() => {
+        if (!deviceConfig?.id) return;
+
+        const poll = setInterval(async () => {
+            try {
+                const response = await fetch(
+                    `${backendUrl}/api/v1/config/devices/${deviceConfig.id}`,
+                );
+                if (!response.ok) return;
+                const config: IConfigDevice | null = await response.json();
+                if (config?.paired_at) {
+                    clearInterval(poll);
+                    setDeviceView("list");
+                }
+            } catch {
+                // transient network error — try again next tick
+            }
+        }, 2000);
+
+        return () => clearInterval(poll);
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deviceConfig?.id, backendUrl]);
     return (
         <div>
             <div className={`flex flex-col`}>
