@@ -46,16 +46,31 @@ export default function Storefront() {
                 );
             }
 
-            if (!deviceConfig.square_location) {
+            // Devices may not pin a Square location; fall back to the
+            // deployment's OAuth-connected location.
+            let location = deviceConfig.square_location;
+            if (!location) {
+                const statusResponse = await fetch(
+                    `${backendUrl}/api/v1/square/oauth/status`,
+                );
+                if (!statusResponse.ok) {
+                    throw new Error("Failed to fetch Square connection status");
+                }
+                location =
+                    (
+                        (await statusResponse.json()) as {
+                            locationId: string | null;
+                        }
+                    ).locationId ?? null;
+            }
+
+            if (!location) {
                 throw new Error("Failed to fetch square location");
             }
 
-            logger.debug(
-                "Fetched device config with location:",
-                deviceConfig.square_location,
-            );
-            setLocationId(deviceConfig.square_location);
-            return deviceConfig.square_location;
+            logger.debug("Fetched device config with location:", location);
+            setLocationId(location);
+            return location;
         }
 
         async function fetchItemsResponse() {

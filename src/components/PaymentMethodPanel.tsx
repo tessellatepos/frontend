@@ -168,8 +168,9 @@ export default function PaymentMethodPanel({
         }
     }
 
-    // TODO(Task 1.1c / 2.3): the mobile app doesn't implement HandlePayment
-    // or the WebView bridge yet, so PAYMENT_RESULT will never arrive today.
+    // Listen for PAYMENT_RESULT from the mobile app's WebView bridge after
+    // it completes a card charge on the Square Reader. The mobile app posts
+    // the result back via ReactNativeWebView.postMessage (see HandlePayment.tsx).
     useEffect(() => {
         if (stage !== "mobile-waiting") return;
 
