@@ -31,8 +31,7 @@ export default function CartItem({ item }: Props) {
                             <div
                                 className={`flex flex-row justify-start items-start`}>
                                 <ItemTitle className="text-xl">
-                                    {item?.pricingType === "FIXED" &&
-                                    item.priceMoney?.amount ? (
+                                    {item.priceMoney?.amount ? (
                                         <>
                                             $
                                             {convertCentsToDollars(
@@ -50,7 +49,7 @@ export default function CartItem({ item }: Props) {
                             </div>
                             <div>
                                 <div>
-                                    {item.quantity && (
+                                    {item.quantity != null && (
                                         <div className="flex items-center gap-2">
                                             <span>Quantity:</span>
                                             <ButtonGroup>

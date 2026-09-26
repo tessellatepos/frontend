@@ -10,12 +10,22 @@ import type {
     ItemVariation as ItemVariationType,
     Item as ItemType,
 } from "@tessellatepos/sdk";
-import { convertCentsToDollars } from "@tessellatepos/sdk";
+import {
+    convertCentsToDollars,
+    convertDollarsToCents,
+    CurrencyCode,
+} from "@tessellatepos/sdk";
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import placeholderImage from "@/components/ui/no_image.webp";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
@@ -95,7 +105,7 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
                             <ItemTitle
                                 className="text-2xl line-clamp-2 items-start text-balance"
                                 title={parentItem?.name ?? undefined}>
-                                {parentItem?.name} - a
+                                {parentItem?.name}
                             </ItemTitle>
                         </ItemContent>
                         <ItemDescription className="text-xl text-black text-center h-5"></ItemDescription>
@@ -132,69 +142,135 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
         const imageSrc = item?.imageURL ?? parent?.image ?? "";
         let titleText = item?.name ?? parent?.name ?? "item";
 
-        if (variationIndex == 0 && parent?.displayName) {
+        if (variationIndex === 0 && parent?.displayName) {
             titleText = parent.displayName;
         }
 
-        if (item?.name == "") {
+        if (item?.name === "") {
             titleText = item.parent?.name ?? "Item Missing Title";
         }
 
-        void imageSrc;
-        void placeholderImage;
+        const hasFixedPrice =
+            item?.pricingType === "FIXED" && !!item.priceMoney?.amount;
+
+        const [manualPriceOpen, setManualPriceOpen] = useState(false);
+        const [manualPrice, setManualPrice] = useState("");
+        const [manualPriceError, setManualPriceError] = useState(false);
+
+        const handleClick = () => {
+            if (hasFixedPrice) {
+                addQuantity(item as CartItemType);
+            } else {
+                setManualPrice("");
+                setManualPriceError(false);
+                setManualPriceOpen(true);
+            }
+        };
+
+        const confirmManualPrice = () => {
+            const cents = convertDollarsToCents(manualPrice);
+            if (cents === null) {
+                setManualPriceError(true);
+                return;
+            }
+            addQuantity({
+                ...(item as CartItemType),
+                // TODO: pull default currency from settings instead of hardcoding
+                priceMoney: { amount: cents, currency: CurrencyCode.CAD },
+            });
+            setManualPriceOpen(false);
+        };
 
         return (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-            <div
-                role="button"
-                tabIndex={0}
-                aria-label={`Add ${titleText} to cart`}
-                onClick={() => addQuantity(item as CartItemType)}
-                className={`cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 ${className}`}>
-                <Item
-                    variant="outline"
-                    className="flex flex-col h-full">
-                    <ItemHeader>
-                        {imageSrc ? (
-                            <div
-                                style={{ width: "100%", aspectRatio: "1 / 1" }}>
-                                <img
-                                    src={imageSrc}
-                                    alt={`${titleText} Item Card`}
+            <>
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Add ${titleText} to cart`}
+                    onClick={handleClick}
+                    className={`cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 ${className}`}>
+                    <Item
+                        variant="outline"
+                        className="flex flex-col h-full">
+                        <ItemHeader>
+                            {imageSrc ? (
+                                <div
                                     style={{
                                         width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div className={`w-full aspect-square`}>
-                                <img
-                                    src={placeholderImage}
-                                    alt={`${parentItem?.name} Selectable Card`}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                    }}
-                                />
-                            </div>
+                                        aspectRatio: "1 / 1",
+                                    }}>
+                                    <img
+                                        src={imageSrc}
+                                        alt={`${titleText} Item Card`}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className={`w-full aspect-square`}>
+                                    <img
+                                        src={placeholderImage}
+                                        alt={`${parentItem?.name} Selectable Card`}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </ItemHeader>
+                        <ItemContent>
+                            <ItemTitle className="text-2xl line-clamp-2 items-start h-16 text-balance">
+                                {titleText}
+                            </ItemTitle>
+                            <ItemDescription className="text-xl text-black text-center">
+                                {hasFixedPrice
+                                    ? `$${convertCentsToDollars(item!.priceMoney!.amount)}`
+                                    : "Price varies"}
+                            </ItemDescription>
+                        </ItemContent>
+                    </Item>
+                </div>
+                <Dialog
+                    open={manualPriceOpen}
+                    onOpenChange={setManualPriceOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Enter price for {titleText}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0.00"
+                            value={manualPrice}
+                            onChange={(e) => {
+                                setManualPrice(e.target.value);
+                                setManualPriceError(false);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") confirmManualPrice();
+                            }}
+                        />
+                        {manualPriceError && (
+                            <p className="text-sm text-destructive">
+                                Enter a valid price, e.g. 4.99
+                            </p>
                         )}
-                    </ItemHeader>
-                    <ItemContent>
-                        <ItemTitle className="text-2xl line-clamp-2 items-start h-16 text-balance">
-                            {titleText}
-                        </ItemTitle>
-                        <ItemDescription className="text-xl text-black text-center">
-                            {item?.pricingType === "FIXED" &&
-                            item.priceMoney?.amount
-                                ? `$${convertCentsToDollars(item.priceMoney.amount)}`
-                                : "Price varies"}
-                        </ItemDescription>
-                    </ItemContent>
-                </Item>
-            </div>
+                        <DialogFooter>
+                            <Button onClick={confirmManualPrice}>
+                                Add to cart
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </>
         );
     }
 
