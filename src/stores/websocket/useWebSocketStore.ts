@@ -44,6 +44,7 @@ export function useWebSocketConnection() {
 
         let ws: WebSocket | null = null;
         let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+        let stopped = false;
 
         const connect = () => {
             ws = new WebSocket(wsUrl);
@@ -64,6 +65,7 @@ export function useWebSocketConnection() {
             };
 
             ws.onclose = () => {
+                if (stopped) return;
                 setConnected(false);
                 // Reconnect after a short delay.
                 reconnectTimer = setTimeout(connect, 3000);
@@ -77,6 +79,7 @@ export function useWebSocketConnection() {
         connect();
 
         return () => {
+            stopped = true;
             if (reconnectTimer) clearTimeout(reconnectTimer);
             ws?.close();
         };
