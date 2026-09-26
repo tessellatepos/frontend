@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "dev": "react-router dev --host",
+        "dev": "trap 'exit 0' INT TERM; react-router dev --host",
         "build": "tsc -b && vite build",
         "lint": "prettier . && eslint .",
         "lint:fix": "prettier . --write && eslint . --fix",

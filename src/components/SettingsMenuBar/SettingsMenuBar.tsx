@@ -30,9 +30,6 @@ export default function SettingsMenuBar({ menuItems }: Props): JSX.Element {
                                     onClick={() =>
                                         setView(item.view as SettingsView)
                                     }
-                                    onKeyDown={() =>
-                                        setView(item.view as SettingsView)
-                                    }
                                     className={`flex-1 w-full p-4 text-left cursor-pointer hover:bg-blue-200`}>
                                     <span className={`px-2`}>
                                         <Icon className={`inline-block`} />
