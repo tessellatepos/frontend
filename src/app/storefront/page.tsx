@@ -18,6 +18,7 @@ const logger = new Logger();
 
 export default function Storefront() {
     const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     const [items, setItems] = useState<Item[]>([]);
     const { deviceId } = useParams();
     const { setLocationId, backendUrl, setDeviceId } = useSettingsStore();
@@ -96,15 +97,30 @@ export default function Storefront() {
                 throw new Error("No items found in backend response");
             }
         }
-        void fetchItemsResponse();
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+
+        void (async () => {
+            setLoading(true);
+            try {
+                await fetchItemsResponse();
+            } catch (err) {
+                logger.error("Storefront fetch error:", err);
+                setError(
+                    err instanceof Error ? err.message : "Failed to load data",
+                );
+                setLoading(false);
+            }
+        })();
+    }, [deviceId, backendUrl, setDeviceId, setLocationId]);
 
     return (
         <section className="w-full min-h-screen dark:bg-gray-900">
             <div className="grid grid-cols-[5fr_2fr] h-screen w-full">
                 <main className="overflow-auto overscroll-auto no-scrollbar">
-                    {loading ? (
+                    {error ? (
+                        <div className="flex items-center justify-center h-full text-red-500">
+                            <p>{error}</p>
+                        </div>
+                    ) : loading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner />
                         </div>
