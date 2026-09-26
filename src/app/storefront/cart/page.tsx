@@ -43,13 +43,19 @@ export default function CartPage() {
     );
 
     const createOrder = useCallback(async () => {
+        if (cart.getItems().length === 0) {
+            setError(true);
+            setErrorMessage("Cart is empty");
+            return;
+        }
+
         setLoading(true);
         const order: Order = {
             lineItems: cart.getItems(),
             locationId,
             discounts,
             //TODO remove development reference/indempotency key
-            referenceId: "542d6eb3-9c54-4a31-a1f5-b5249144163d",
+            referenceId: crypto.randomUUID(),
             source: {
                 name: `Tessellate POS - From Device:${deviceId}`,
             },
@@ -66,6 +72,7 @@ export default function CartPage() {
             const body: { message?: string } = await response.json();
             setError(true);
             setErrorMessage(body?.message ?? "Failed to create order");
+            setLoading(false);
         } else {
             const orderRes: Order = await response.json();
 
@@ -75,6 +82,7 @@ export default function CartPage() {
                 setOrder(orderRes);
                 setLoading(false);
             } else {
+                setError(true);
                 setErrorMessage("No order found in backend response");
                 throw new Error("No order found in backend response");
             }
@@ -89,7 +97,9 @@ export default function CartPage() {
         const doFetch = async () => {
             await createOrder();
         };
-        void doFetch();
+        void doFetch().catch((err) => {
+            logger.error("Failed to create order", err);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
