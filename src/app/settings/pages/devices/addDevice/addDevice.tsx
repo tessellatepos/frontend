@@ -82,7 +82,7 @@ export default function AddDevice() {
             </div>
             <div>
                 <h1>{deviceConfig?.id}</h1>
-                <h1>{deviceConfig?.paring_code}</h1>
+                <h1>{deviceConfig?.pairing_code}</h1>
             </div>
         </div>
     );
