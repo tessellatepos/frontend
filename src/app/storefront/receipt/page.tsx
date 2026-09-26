@@ -1,4 +1,5 @@
 import type { CartItem as CartItemType } from "@tessellatepos/sdk";
+import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
@@ -7,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { convertCentsToDollars } from "@tessellatepos/sdk";
 import { useOrdersStore } from "@/stores/order/useOrdersStore.ts";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
+import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
 const PAYMENT_METHOD_LABEL: Record<string, string> = {
     CASH: "Cash",
@@ -119,6 +121,8 @@ export default function ReceiptPage() {
                         </div>
                     )}
                 </div>
+
+                <PluginHost mount={PluginUIMountPoint.RECEIPT_EXTRA} />
 
                 <Button
                     className="mt-2 p-6 text-lg"

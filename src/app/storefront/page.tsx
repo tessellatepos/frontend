@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { CartItem, Item } from "@tessellatepos/sdk";
 import type { IConfigDevice } from "@tessellatepos/sdk";
+import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 // import { configDotenv } from "dotenv";
 import { Logger } from "tslog";
 import ItemCard from "@/components/ItemCard.tsx";
@@ -9,6 +10,7 @@ import Cart from "@/components/Cart.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useParams } from "react-router";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
+import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
 const logger = new Logger();
 
@@ -138,8 +140,9 @@ export default function Storefront() {
                         </div>
                     )}
                 </main>
-                <aside className="overflow-auto overscroll-auto no-scrollbar">
+                <aside className="overflow-auto overscroll-auto no-scrollbar flex flex-col h-full">
                     <Cart />
+                    <PluginHost mount={PluginUIMountPoint.CART_SIDEBAR} />
                 </aside>
             </div>
         </section>

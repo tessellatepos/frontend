@@ -7,6 +7,8 @@ import {
     SettingsMenuBar,
 } from "@/components/SettingsMenuBar/";
 import { MonitorSmartphone, Paintbrush, Settings } from "lucide-react";
+import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
+import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
 export default function Config() {
     const { view } = useSettingsStore();
@@ -47,7 +49,10 @@ export default function Config() {
                 <div className={`flex w-full`}>
                     <SettingsMenuBar menuItems={menuItems} />
                 </div>
-                <div>{settingsPage()}</div>
+                <div className="flex flex-col">
+                    {settingsPage()}
+                    <PluginHost mount={PluginUIMountPoint.SETTINGS_TAB} />
+                </div>
             </div>
         </div>
     );

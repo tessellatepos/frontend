@@ -1,6 +1,7 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { Theme } from "@radix-ui/themes";
 import { useWebSocketConnection } from "@/stores/websocket/useWebSocketStore.ts";
+import { PluginLoader } from "@/plugin-host/PluginLoader.tsx";
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -26,5 +27,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
     useWebSocketConnection();
-    return <Outlet />;
+    return (
+        <PluginLoader>
+            <Outlet />
+        </PluginLoader>
+    );
 }

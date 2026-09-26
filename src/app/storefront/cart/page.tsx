@@ -1,6 +1,7 @@
 import CartItem from "@/components/CartItem";
 import PaymentMethodPanel from "@/components/PaymentMethodPanel";
 import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
+import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Logger } from "tslog";
@@ -14,6 +15,7 @@ import {
     type PaymentMethod,
 } from "@/stores/order/useOrdersStore.ts";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
+import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
 const logger = new Logger();
 
@@ -172,6 +174,8 @@ export default function CartPage() {
                             />
                         </div>
                     )}
+
+                    <PluginHost mount={PluginUIMountPoint.CHECKOUT_FOOTER} />
                 </aside>
             </div>
         </div>

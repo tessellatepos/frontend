@@ -9,5 +9,6 @@ export default [
         route("storefront/cart", "app/storefront/cart/page.tsx"),
         route("storefront/receipt", "app/storefront/receipt/page.tsx"),
     ]),
+    route("plugins/:pluginName", "app/plugin-page.tsx"),
     route("*?", "app/getting-started/page.tsx"),
 ] satisfies RouteConfig;
