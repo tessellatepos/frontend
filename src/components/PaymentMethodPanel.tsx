@@ -64,7 +64,6 @@ export default function PaymentMethodPanel({
         };
     }, []);
 
-    // TODO(Task 1.1b): POST /pay-cash isn't implemented on the backend yet.
     async function submitCashPayment() {
         setSubmitting(true);
         setErrorMessage("");
@@ -104,7 +103,6 @@ export default function PaymentMethodPanel({
         }
     }
 
-    // TODO(Task 1.1a): GET /:orderId/checkout/:checkoutId isn't implemented yet.
     async function pollTerminalStatus(checkoutId: string) {
         try {
             const response = await fetch(
@@ -113,13 +111,11 @@ export default function PaymentMethodPanel({
             if (!response.ok) {
                 throw new Error(`status endpoint returned ${response.status}`);
             }
-            const body: { status?: string } = await response.json();
+            const body: { status?: string; order?: Order } =
+                await response.json();
 
             if (body.status === "COMPLETED") {
-                // TODO: once Task 3.3 (order detail) exists, refetch the order
-                // here to get accurate tender info instead of reusing the
-                // pre-payment order snapshot.
-                onPaid(order, "TERMINAL");
+                onPaid(body.order ?? order, "TERMINAL");
                 return;
             }
             if (body.status === "CANCELED") {
@@ -153,11 +149,11 @@ export default function PaymentMethodPanel({
                 );
                 return;
             }
-            const body: { checkoutId: string; status?: string } =
+            const body: { checkoutId: string; status?: string; order?: Order } =
                 await response.json();
 
             if (body.status === "COMPLETED") {
-                onPaid(order, "TERMINAL");
+                onPaid(body.order ?? order, "TERMINAL");
                 return;
             }
             await pollTerminalStatus(body.checkoutId);
@@ -201,6 +197,9 @@ export default function PaymentMethodPanel({
         }
 
         function handleBridgeMessage(event: MessageEvent) {
+            // Only accept messages from the same origin (WebView bridge)
+            if (event.origin !== window.location.origin) return;
+
             let data: { type?: string; paymentId?: string; reason?: string };
             try {
                 data =
