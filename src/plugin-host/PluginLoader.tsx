@@ -1,10 +1,24 @@
+import * as React from "react";
 import { type ReactNode, useEffect } from "react";
+import * as jsxRuntime from "react/jsx-runtime";
+import * as sdk from "@tessellatepos/sdk";
+import * as pluginSdk from "@tessellatepos/plugin-sdk";
 import { FrontendPlugin, type PluginManifest } from "@tessellatepos/plugin-sdk";
+import { exposeSharedModules } from "@tessellatepos/plugin-sdk/host";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { usePluginStore } from "@/stores/plugins/pluginStore.ts";
 import { Logger } from "tslog";
 
 const logger = new Logger();
+
+// Plugin bundles don't ship their own React or SDKs; they use these
+// instances. Must run before any plugin bundle is imported.
+exposeSharedModules({
+    react: React,
+    "react/jsx-runtime": jsxRuntime,
+    "@tessellatepos/sdk": sdk,
+    "@tessellatepos/plugin-sdk": pluginSdk,
+});
 
 interface PluginClientModule {
     default: (plugin: FrontendPlugin) => void | Promise<void>;
