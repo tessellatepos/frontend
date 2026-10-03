@@ -1,48 +1,24 @@
-# Builder stage: build the Vite app
-FROM node:25-alpine AS builder
+FROM node:24-alpine AS builder
+WORKDIR /app
 
-ARG FRONTEND_DIR=frontend
+COPY package.json ./
+RUN npm install --ignore-scripts --legacy-peer-deps
 
-# Put frontend package.json and sources under /app/frontend so file://../common resolves to /app/common
-WORKDIR /app/frontend
-
-# Copy package files and the local common package so file://../common resolves
-COPY ${FRONTEND_DIR}/package*.json ./
-# place common as a sibling: /app/common
-COPY common /app/common
-
-# Install (including devDeps) to run the build
-RUN npm ci
-
-# Build the local `common` package using the installed TypeScript compiler so its lib/ exists
-# Use the project's tsc (from node_modules) to avoid installing TypeScript inside common
-RUN ./node_modules/.bin/tsc -b ../common
-
-# Copy project files needed for the build
-COPY ${FRONTEND_DIR}/tsconfig.json ./
-COPY ${FRONTEND_DIR}/tsconfig.node.json ./
-COPY ${FRONTEND_DIR}/tsconfig.app.json ./
-COPY ${FRONTEND_DIR}/vite.config.ts ./
-COPY ${FRONTEND_DIR}/index.html ./
-COPY ${FRONTEND_DIR}/public ./public
-COPY ${FRONTEND_DIR}/src ./src
-COPY ${FRONTEND_DIR}/components.json ./
-
-# Build the production bundle
+COPY . .
 RUN npm run build
 
-# Production stage: serve with nginx
+# Serve the static SPA (react-router ssr:false emits build/client)
 FROM nginx:stable-alpine AS production
-
-# Remove default nginx index page
 RUN rm -rf /usr/share/nginx/html/*
+COPY --from=builder /app/build/client /usr/share/nginx/html
 
-# Copy built files
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
-
-# Copy a small nginx config to enable SPA fallback
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+# envsubst renders this at startup; only BACKEND_URL and the resolver are substituted
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+ENV BACKEND_URL=http://backend:3000
+# Docker's embedded DNS; override for other orchestrators (e.g. kube-dns)
+ENV DNS_RESOLVER=127.0.0.11
+ENV NGINX_ENVSUBST_FILTER="BACKEND_URL|DNS_RESOLVER"
 
 EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO /dev/null http://127.0.0.1/ || exit 1
