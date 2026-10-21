@@ -1,20 +1,14 @@
-import type { IConfigDevice } from "@tessellatepos/sdk";
+import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import AddDevice from "@/app/settings/pages/devices/addDevice/addDevice.tsx";
 import PairSquareTerminal from "@/app/settings/pages/devices/pairSquareTerminal/pairSquareTerminal.tsx";
 
-interface ISquareLocation {
-    id: string;
-    name: string;
-    status: string | null;
-}
-
 export default function Devices() {
     // configDotenv();
     const { deviceView, setDeviceView, backendUrl } = useSettingsStore();
     const [deviceConfigs, setDeviceConfigs] = useState<IConfigDevice[]>([]);
-    const [locations, setLocations] = useState<ISquareLocation[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     async function fetchDeviceConfigs() {
@@ -37,19 +31,22 @@ export default function Devices() {
         }
     }
 
+    /**
+     * Lists the locations a device can be pinned to. The backend persists
+     * them from whichever provider is active, so this works without Square.
+     */
     async function fetchLocations() {
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/square/locations`,
-            );
-            if (!response.ok) return; // Square not connected — leave dropdown empty
-            setLocations((await response.json()) as ISquareLocation[]);
+            const response = await fetch(`${backendUrl}/api/v1/locations`);
+            if (response.ok) {
+                setLocations((await response.json()) as Location[]);
+            }
         } catch (err) {
-            console.error("Failed to fetch Square locations", err);
+            console.error("Failed to fetch locations", err);
         }
     }
 
-    /** Saves the device's pinned Square location; empty means deployment default. */
+    /** Saves the device's pinned location; empty means deployment default. */
     async function setDeviceLocation(
         device: IConfigDevice,
         locationId: string,

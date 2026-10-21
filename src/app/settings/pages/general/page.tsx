@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
+import type { Location } from "@tessellatepos/sdk";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 
 interface ISquareAuthStatus {
@@ -13,6 +14,7 @@ export default function SettingsHome() {
     const { backendUrl } = useSettingsStore();
     const [searchParams, setSearchParams] = useSearchParams();
     const [status, setStatus] = useState<ISquareAuthStatus>();
+    const [locationName, setLocationName] = useState<string>();
     const [message, setMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [busy, setBusy] = useState(false);
@@ -28,7 +30,19 @@ export default function SettingsHome() {
             if (!response.ok) {
                 throw new Error(`status endpoint returned ${response.status}`);
             }
-            setStatus((await response.json()) as ISquareAuthStatus);
+            const authStatus = (await response.json()) as ISquareAuthStatus;
+            setStatus(authStatus);
+
+            if (authStatus.locationId) {
+                const locationResponse = await fetch(
+                    `${backendUrl}/api/v1/locations/${authStatus.locationId}`,
+                );
+                if (locationResponse.ok) {
+                    setLocationName(
+                        ((await locationResponse.json()) as Location).name,
+                    );
+                }
+            }
         } catch (err) {
             console.error("Failed to read Square connection status", err);
             setErrorMessage("Could not read the Square connection status.");
@@ -122,7 +136,7 @@ export default function SettingsHome() {
                         <dt className={`font-semibold`}>Merchant</dt>
                         <dd>{status.merchantId ?? "—"}</dd>
                         <dt className={`font-semibold`}>Location</dt>
-                        <dd>{status.locationId ?? "—"}</dd>
+                        <dd>{locationName ?? status.locationId ?? "—"}</dd>
                         <dt className={`font-semibold`}>Token renews before</dt>
                         <dd>
                             {status.tokenExpiresAt

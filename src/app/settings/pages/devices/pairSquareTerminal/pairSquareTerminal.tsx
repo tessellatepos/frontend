@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
-import type { IConfigDevice } from "@tessellatepos/sdk";
-
-interface ISquareLocation {
-    id: string;
-    name: string;
-    status: string | null;
-}
+import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 
 type PairingStatus = "UNKNOWN" | "UNPAIRED" | "PAIRED" | "EXPIRED";
 
@@ -16,7 +10,7 @@ type PairingStatus = "UNKNOWN" | "UNPAIRED" | "PAIRED" | "EXPIRED";
 // with the terminal's real device_id — the id order checkouts need.
 export default function PairSquareTerminal() {
     const { setDeviceView, backendUrl } = useSettingsStore();
-    const [locations, setLocations] = useState<ISquareLocation[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
     const [locationId, setLocationId] = useState("");
     const [name, setName] = useState("");
     const [device, setDevice] = useState<IConfigDevice>();
@@ -34,7 +28,7 @@ export default function PairSquareTerminal() {
                     `${backendUrl}/api/v1/square/locations`,
                 );
                 if (!response.ok) return;
-                setLocations((await response.json()) as ISquareLocation[]);
+                setLocations((await response.json()) as Location[]);
             } catch (err) {
                 console.error("Failed to fetch Square locations", err);
             }
