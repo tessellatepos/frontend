@@ -13,7 +13,6 @@ import type {
 import {
     convertCentsToDollars,
     convertDollarsToCents,
-    CurrencyCode,
 } from "@tessellatepos/sdk";
 import { useState } from "react";
 import {
@@ -176,7 +175,7 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
             addQuantity({
                 ...(item as CartItemType),
                 // TODO: pull default currency from settings instead of hardcoding
-                priceMoney: { amount: cents, currency: CurrencyCode.CAD },
+                priceMoney: { amount: cents, currency: "CAD" },
             });
             setManualPriceOpen(false);
         };

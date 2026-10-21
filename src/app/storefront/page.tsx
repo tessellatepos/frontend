@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { CartItem, Item } from "@tessellatepos/sdk";
-import type { IConfigDevice } from "@tessellatepos/sdk";
+import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 // import { configDotenv } from "dotenv";
 import { Logger } from "tslog";
@@ -49,26 +49,39 @@ export default function Storefront() {
                 );
             }
 
-            // Devices may not pin a Square location; fall back to the
-            // deployment's OAuth-connected location.
+            // Devices may not pin a location. Fall back to the location of
+            // the deployment's Square connection, if it has one, then to the
+            // only location when there's just one.
             let location = deviceConfig.square_location;
             if (!location) {
                 const statusResponse = await fetch(
                     `${backendUrl}/api/v1/square/oauth/status`,
                 );
-                if (!statusResponse.ok) {
-                    throw new Error("Failed to fetch Square connection status");
+                if (statusResponse.ok) {
+                    location =
+                        (
+                            (await statusResponse.json()) as {
+                                locationId: string | null;
+                            }
+                        ).locationId ?? null;
                 }
-                location =
-                    (
-                        (await statusResponse.json()) as {
-                            locationId: string | null;
-                        }
-                    ).locationId ?? null;
             }
 
             if (!location) {
-                throw new Error("Failed to fetch square location");
+                const locationsResponse = await fetch(
+                    `${backendUrl}/api/v1/locations`,
+                );
+                if (locationsResponse.ok) {
+                    const locations =
+                        (await locationsResponse.json()) as Location[];
+                    if (locations.length === 1) location = locations[0].id;
+                }
+            }
+
+            if (!location) {
+                throw new Error(
+                    "This device has no location. Choose one under Settings → Devices.",
+                );
             }
 
             logger.debug("Fetched device config with location:", location);
