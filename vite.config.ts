@@ -16,7 +16,9 @@ export default defineConfig({
     server: {
         proxy: {
             "/api": "http://localhost:3000",
-            "/plugins": "http://localhost:3000",
+            // Only a plugin's own routes and assets (/plugins/<name>/...);
+            // /plugins/<name> itself is the frontend's plugin page.
+            "^/plugins/[^/]+/.+": "http://localhost:3000",
             "/auth": "http://localhost:3000",
         },
     },
