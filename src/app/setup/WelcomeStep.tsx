@@ -6,6 +6,8 @@ interface Props {
     token: string;
     onToken: (token: string) => void;
     onContinue: () => void;
+    /** Why the last attempt bounced back here, if it did. */
+    error?: string;
 }
 
 /** Step 1: welcome and the setup token. */
@@ -14,6 +16,7 @@ export function WelcomeStep({
     token,
     onToken,
     onContinue,
+    error,
 }: Props) {
     return (
         <form
@@ -35,6 +38,7 @@ export function WelcomeStep({
                     autoComplete="off"
                     spellCheck={false}
                     required
+                    error={error}
                     hint='The setup token is printed in the server log the first time the backend starts (look for "setup token"), or it is the SETUP_TOKEN value set in the server&apos;s environment.'
                 />
             )}

@@ -20,6 +20,7 @@ export default function Setup() {
     const setup = useAuthStore((s) => s.setup);
     const [token, setToken] = useState("");
     const [passedWelcome, setPassedWelcome] = useState(false);
+    const [tokenError, setTokenError] = useState("");
 
     if (status === "unknown" || setupNeeded === null || !setup) {
         return (
@@ -76,13 +77,20 @@ export default function Setup() {
                     tokenRequired={setup.setupTokenRequired}
                     token={token}
                     onToken={setToken}
-                    onContinue={() => setPassedWelcome(true)}
+                    error={tokenError}
+                    onContinue={() => {
+                        setTokenError("");
+                        setPassedWelcome(true);
+                    }}
                 />
             )}
             {step === 1 && (
                 <OwnerStep
                     token={token}
-                    onBadToken={() => setPassedWelcome(false)}
+                    onBadToken={(message) => {
+                        setTokenError(message);
+                        setPassedWelcome(false);
+                    }}
                 />
             )}
             {step === 2 &&

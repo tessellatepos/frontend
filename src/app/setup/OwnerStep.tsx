@@ -10,7 +10,7 @@ export const MIN_PASSWORD_LENGTH = 8;
 interface Props {
     token: string;
     /** Sends the user back to step 1 (bad token). */
-    onBadToken: () => void;
+    onBadToken: (message: string) => void;
 }
 
 /** Step 2: create the owner account. */
@@ -56,8 +56,9 @@ export function OwnerStep({ token, onBadToken }: Props) {
         if (result.ok) {
             await refresh();
         } else if (result.status === 403) {
-            setError("That setup token is not correct. Check the server log.");
-            onBadToken();
+            onBadToken(
+                "That setup token is not correct. Check the server log.",
+            );
         } else if (result.status === 409) {
             // SETUP_COMPLETE / USER_EXISTS: someone already set this up.
             await refresh();
