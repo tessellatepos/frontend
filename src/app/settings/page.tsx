@@ -8,10 +8,15 @@ import {
 } from "@/components/SettingsMenuBar/";
 import { MonitorSmartphone, Paintbrush, Settings } from "lucide-react";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
+import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
+import { useNavigate } from "react-router";
 import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
 export default function Config() {
     const { view } = useSettingsStore();
+    const user = useAuthStore((s) => s.user);
+    const signOut = useAuthStore((s) => s.signOut);
+    const navigate = useNavigate();
 
     const settingsPage = () => {
         if (view == undefined || view == "general") return <SettingsHome />;
@@ -42,8 +47,25 @@ export default function Config() {
 
     return (
         <div className={`flex flex-col`}>
-            <div className={`w-full h-full py-5`}>
+            <div
+                className={`flex w-full items-center justify-between py-5 pr-5`}>
                 <span className={`pl-5 text-4xl`}>Settings</span>
+                {user && (
+                    <div className={`flex items-center gap-3`}>
+                        <span className={`text-sm text-gray-500`}>
+                            {user.name}
+                        </span>
+                        <button
+                            className={`rounded border px-3 py-1`}
+                            onClick={() =>
+                                void signOut().then(() =>
+                                    navigate("/login", { replace: true }),
+                                )
+                            }>
+                            Sign out
+                        </button>
+                    </div>
+                )}
             </div>
             <div className={`grid grid-cols-[2fr_7fr] w-full h-full`}>
                 <div className={`flex w-full`}>
