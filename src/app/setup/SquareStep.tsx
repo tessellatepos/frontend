@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { apiFetch } from "@/utils/apiFetch.ts";
@@ -12,13 +12,21 @@ export function SquareStep() {
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
 
-    const failed = params.get("square_auth") === "error";
+    // The backend's OAuth callback redirects back to /setup with the outcome.
+    const outcome = params.get("square_auth");
+    const failed = outcome === "error";
+
+    useEffect(() => {
+        if (outcome === "success") void refresh();
+    }, [outcome, refresh]);
 
     async function connect() {
         setBusy(true);
         setError("");
         try {
-            const response = await apiFetch("/api/v1/square/oauth/authorize");
+            const response = await apiFetch(
+                "/api/v1/square/oauth/authorize?returnTo=%2Fsetup",
+            );
             if (!response.ok) throw new Error(`status ${response.status}`);
             const { url }: { url: string } = await response.json();
             window.location.assign(url);
@@ -42,6 +50,9 @@ export function SquareStep() {
                 Status:{" "}
                 <strong>{connected ? "Connected" : "Not connected"}</strong>
             </p>
+            {outcome === "success" && connected && (
+                <p role="status">Square connected.</p>
+            )}
             {failed && !connected && (
                 <StepError>
                     Square authorization failed or was denied. Try again.
