@@ -4,6 +4,7 @@ import { index, layout, route } from "@react-router/dev/routes";
 
 export default [
     index("app/home/page.tsx"),
+    route("setup", "app/setup/page.tsx"),
     route("login", "app/login/page.tsx"),
     layout("app/require-auth.tsx", [
         route("settings", "app/settings/page.tsx"),

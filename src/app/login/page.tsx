@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router";
-import { SIGNED_IN_HOME, useAuthStore } from "@/stores/auth/useAuthStore.ts";
+import { inSetupWizard, useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { authClient } from "@/utils/authClient.ts";
 import { safeReturnTo } from "@/utils/returnTo.ts";
 import { FormField } from "@/components/FormField.tsx";
@@ -12,6 +12,7 @@ export default function Login() {
     const navigate = useNavigate();
     const status = useAuthStore((s) => s.status);
     const setupNeeded = useAuthStore((s) => s.setupNeeded);
+    const wizard = useAuthStore(inSetupWizard);
     const refresh = useAuthStore((s) => s.refresh);
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
@@ -19,7 +20,7 @@ export default function Login() {
     const [busy, setBusy] = useState(false);
     const errorRef = useRef<HTMLParagraphElement>(null);
 
-    const returnTo = safeReturnTo(params.get("returnTo"), SIGNED_IN_HOME);
+    const returnTo = safeReturnTo(params.get("returnTo"), "/");
 
     useEffect(() => {
         if (error) errorRef.current?.focus();
@@ -32,7 +33,7 @@ export default function Login() {
             </div>
         );
     }
-    if (setupNeeded)
+    if (wizard)
         return (
             <Navigate
                 to="/setup"

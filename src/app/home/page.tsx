@@ -1,5 +1,9 @@
 import { Navigate } from "react-router";
-import { SIGNED_IN_HOME, useAuthStore } from "@/stores/auth/useAuthStore.ts";
+import {
+    SIGNED_IN_HOME,
+    inSetupWizard,
+    useAuthStore,
+} from "@/stores/auth/useAuthStore.ts";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { getDeviceToken, getStoredDeviceId } from "@/utils/apiFetch.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
@@ -8,6 +12,7 @@ import { Spinner } from "@/components/ui/spinner.tsx";
 export default function Home() {
     const status = useAuthStore((s) => s.status);
     const setupNeeded = useAuthStore((s) => s.setupNeeded);
+    const wizard = useAuthStore(inSetupWizard);
     const knownDeviceId = useSettingsStore((s) => s.deviceId);
 
     if (status === "unknown" || setupNeeded === null) {
@@ -17,7 +22,7 @@ export default function Home() {
             </div>
         );
     }
-    if (setupNeeded)
+    if (wizard)
         return (
             <Navigate
                 to="/setup"

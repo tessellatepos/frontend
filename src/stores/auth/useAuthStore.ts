@@ -82,3 +82,14 @@ onSessionLost(() => {
         `/login?returnTo=${encodeURIComponent(pathname + search)}`,
     );
 });
+
+/**
+ * True when the visitor belongs in the setup wizard: no owner exists yet, or
+ * an owner is signed in part-way through setup (resuming).
+ */
+export function inSetupWizard(state: AuthState): boolean {
+    return (
+        state.setupNeeded === true &&
+        (!state.setup?.steps.owner || state.status === "signed-in")
+    );
+}
