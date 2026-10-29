@@ -5,6 +5,15 @@ import { authClient } from "@/utils/authClient.ts";
 import { safeReturnTo } from "@/utils/returnTo.ts";
 import { FormField } from "@/components/FormField.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { PluginHost } from "@/plugin-host/PluginHost.tsx";
+import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
+import { apiFetch } from "@/utils/apiFetch.ts";
+
+interface PublicProvider {
+    id: string;
+    label: string;
+    kind: "oidc" | "oauth" | "social" | "custom";
+}
 
 /** Email-or-username + password sign-in. */
 export default function Login() {
@@ -18,9 +27,19 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [busy, setBusy] = useState(false);
+    const [providers, setProviders] = useState<PublicProvider[]>([]);
     const errorRef = useRef<HTMLParagraphElement>(null);
 
     const returnTo = safeReturnTo(params.get("returnTo"), "/");
+    // A provider redirect that failed comes back as ?error=<code>&...
+    const providerError = params.get("error");
+
+    useEffect(() => {
+        apiFetch("/api/v1/auth-providers/public")
+            .then((r) => (r.ok ? (r.json() as Promise<PublicProvider[]>) : []))
+            .then(setProviders)
+            .catch(() => setProviders([]));
+    }, []);
 
     useEffect(() => {
         if (error) errorRef.current?.focus();
@@ -75,6 +94,32 @@ export default function Login() {
         }
     }
 
+    async function signInWith(provider: PublicProvider) {
+        setError("");
+        try {
+            // The provider returns the browser to callbackURL, with ?error=
+            // appended on failure. Landing on /login keeps the error visible
+            // (a signed-in user is forwarded on to returnTo from here).
+            const callbackURL = `/login?returnTo=${encodeURIComponent(returnTo)}&provider=${encodeURIComponent(provider.id)}`;
+            const { error: authError } = await authClient.signIn.social({
+                provider: provider.id,
+                callbackURL,
+            });
+            if (authError)
+                setError(`Could not start sign-in with ${provider.label}.`);
+        } catch (err) {
+            console.error("Provider sign-in failed", err);
+            setError("Could not reach the server. Try again.");
+        }
+    }
+
+    const label = providers.find((p) => p.id === params.get("provider"))?.label;
+    const providerMessage = !providerError
+        ? ""
+        : providerError === "access_denied"
+          ? `Your account isn't allowed to sign in${label ? ` with ${label}` : " this way"}.`
+          : "Sign-in with that provider failed. Try again or use another method.";
+
     return (
         <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-5 p-5">
             <h1 className="text-3xl">Sign in</h1>
@@ -112,6 +157,30 @@ export default function Login() {
                     {busy ? "Signing in…" : "Sign in"}
                 </button>
             </form>
+            {providerMessage && (
+                <p
+                    role="alert"
+                    className="text-sm text-red-600">
+                    {providerMessage}
+                </p>
+            )}
+            {providers.length > 0 && (
+                <div
+                    role="group"
+                    aria-label="Other ways to sign in"
+                    className="flex flex-col gap-2">
+                    {providers.map((p) => (
+                        <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => void signInWith(p)}
+                            className="rounded border px-4 py-2">
+                            {p.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+            <PluginHost mount={PluginUIMountPoint.AUTH_METHOD} />
         </main>
     );
 }
