@@ -24,6 +24,7 @@ export default function Config() {
     const { view } = useSettingsStore();
     const user = useAuthStore((s) => s.user);
     const signOut = useAuthStore((s) => s.signOut);
+    const signOutError = useAuthStore((s) => s.signOutError);
     const navigate = useNavigate();
 
     const settingsPage = () => {
@@ -85,12 +86,22 @@ export default function Config() {
                         <button
                             className={`rounded border px-3 py-1`}
                             onClick={() =>
-                                void signOut().then(() =>
-                                    navigate("/login", { replace: true }),
-                                )
+                                void signOut().then((done) => {
+                                    if (done)
+                                        void navigate("/login", {
+                                            replace: true,
+                                        });
+                                })
                             }>
                             Sign out
                         </button>
+                        {signOutError && (
+                            <span
+                                role="alert"
+                                className={`text-sm text-red-600`}>
+                                {signOutError}
+                            </span>
+                        )}
                     </div>
                 )}
             </div>

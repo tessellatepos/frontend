@@ -35,7 +35,13 @@ interface AuthState {
     setup: SetupStatus | null;
     /** Re-reads the session and the setup status. */
     refresh: () => Promise<void>;
-    signOut: () => Promise<void>;
+    /** Why the last sign-out attempt failed; null otherwise. */
+    signOutError: string | null;
+    /**
+     * Ends the server session. Resolves true (and clears local state) when
+     * the session is gone, false (keeping the user signed in) when it may not be.
+     */
+    signOut: () => Promise<boolean>;
 }
 
 /** Where a signed-in user lands from `/`; the dashboard will replace this. */
@@ -46,6 +52,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     user: null,
     setupNeeded: null,
     setup: null,
+    signOutError: null,
     refresh: async () => {
         const [session, setup] = await Promise.all([
             authClient
@@ -64,11 +71,19 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
     },
     signOut: async () => {
-        try {
-            await authClient.signOut();
-        } finally {
-            set({ status: "signed-out", user: null });
+        set({ signOutError: null });
+        // better-auth reports HTTP failures in `error` rather than throwing.
+        const failure = await authClient
+            .signOut()
+            .then((r) => r.error ?? null)
+            .catch(() => ({ status: 0 }));
+        // 401 means the server has no session for us: already signed out.
+        if (failure && failure.status !== 401) {
+            set({ signOutError: "Couldn't sign you out. Try again." });
+            return false;
         }
+        set({ status: "signed-out", user: null });
+        return true;
     },
 }));
 
