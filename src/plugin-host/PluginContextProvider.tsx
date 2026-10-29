@@ -26,7 +26,11 @@ export function PluginContextProvider({ pluginName, children }: Props) {
     const navigate = useNavigate();
 
     const api = useMemo(
-        () => createPluginApiClient(backendUrl, pluginName),
+        () =>
+            createPluginApiClient(
+                backendUrl || window.location.origin,
+                pluginName,
+            ),
         [backendUrl, pluginName],
     );
 

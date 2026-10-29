@@ -75,8 +75,10 @@ export function PluginLoader({ children }: { children: ReactNode }) {
                                     "/",
                                 )
                                     ? p.clientEntryUrl!
-                                    : new URL(p.clientEntryUrl!, backendUrl)
-                                          .href;
+                                    : new URL(
+                                          p.clientEntryUrl!,
+                                          backendUrl || window.location.origin,
+                                      ).href;
 
                                 const module = (await import(
                                     /* @vite-ignore */ importUrl
