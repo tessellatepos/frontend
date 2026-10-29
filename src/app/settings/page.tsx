@@ -1,12 +1,18 @@
 import { useSettingsStore } from "@/stores/settings/useSettingsStore";
 import Appearance from "@/app/settings/pages/appearance/page";
 import Devices from "@/app/settings/pages/devices/page";
+import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import {
     type ISettingsMenuBarProps,
     SettingsMenuBar,
 } from "@/components/SettingsMenuBar/";
-import { MonitorSmartphone, Paintbrush, Settings } from "lucide-react";
+import {
+    MonitorSmartphone,
+    Paintbrush,
+    Settings,
+    Users as UsersIcon,
+} from "lucide-react";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { useNavigate } from "react-router";
@@ -22,6 +28,7 @@ export default function Config() {
         if (view == undefined || view == "general") return <SettingsHome />;
         // if (view == "appearance") return <Appearance />;
         if (view == "devices") return <Devices />;
+        if (view == "users") return <Users />;
     };
 
     const menuItems: ISettingsMenuBarProps[] = [
@@ -43,6 +50,17 @@ export default function Config() {
             view: "devices",
             icon: MonitorSmartphone,
         },
+        // Owner-only; the backend enforces this, the tabs are just hidden.
+        ...(user?.role === "owner"
+            ? [
+                  {
+                      name: "Users",
+                      page: <Users />,
+                      view: "users",
+                      icon: UsersIcon,
+                  },
+              ]
+            : []),
     ];
 
     return (
