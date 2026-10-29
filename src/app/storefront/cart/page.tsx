@@ -1,3 +1,4 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import CartItem from "@/components/CartItem";
 import PaymentMethodPanel from "@/components/PaymentMethodPanel";
 import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
@@ -24,7 +25,7 @@ export default function CartPage() {
     const [error, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [order, setOrder] = useState<Order>();
-    const { locationId, backendUrl, deviceId } = useSettingsStore();
+    const { locationId, deviceId } = useSettingsStore();
     const { discounts, setCompletedOrder } = useOrdersStore();
     const { cart, clearCart } = useCartStore();
     const navigate = useNavigate();
@@ -60,7 +61,7 @@ export default function CartPage() {
                 name: `Tessellate POS - From Device:${deviceId}`,
             },
         };
-        const response = await fetch(`${backendUrl}/api/v1/orders/create`, {
+        const response = await apiFetch(`/api/v1/orders/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(order, (_, v) =>
@@ -87,7 +88,7 @@ export default function CartPage() {
                 throw new Error("No order found in backend response");
             }
         }
-    }, [cart, locationId, discounts, deviceId, backendUrl]);
+    }, [cart, locationId, discounts, deviceId]);
 
     useEffect(() => {
         // Only create the order once, from the cart as it stood on mount —
@@ -179,7 +180,6 @@ export default function CartPage() {
                         <div className="rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
                             <PaymentMethodPanel
                                 order={order}
-                                backendUrl={backendUrl}
                                 onPaid={handlePaid}
                             />
                         </div>

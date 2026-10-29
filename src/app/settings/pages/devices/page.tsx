@@ -1,3 +1,4 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
@@ -6,13 +7,13 @@ import PairSquareTerminal from "@/app/settings/pages/devices/pairSquareTerminal/
 
 export default function Devices() {
     // configDotenv();
-    const { deviceView, setDeviceView, backendUrl } = useSettingsStore();
+    const { deviceView, setDeviceView } = useSettingsStore();
     const [deviceConfigs, setDeviceConfigs] = useState<IConfigDevice[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     async function fetchDeviceConfigs() {
-        const response = await fetch(`${backendUrl}/api/v1/config/devices`);
+        const response = await apiFetch(`/api/v1/config/devices`);
 
         if (!response.ok) {
             throw new Error(
@@ -37,7 +38,7 @@ export default function Devices() {
      */
     async function fetchLocations() {
         try {
-            const response = await fetch(`${backendUrl}/api/v1/locations`);
+            const response = await apiFetch(`/api/v1/locations`);
             if (response.ok) {
                 setLocations((await response.json()) as Location[]);
             }
@@ -52,8 +53,8 @@ export default function Devices() {
         locationId: string,
     ) {
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/config/devices/${device.id}`,
+            const response = await apiFetch(
+                `/api/v1/config/devices/${device.id}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -88,8 +89,7 @@ export default function Devices() {
             }
         };
         void doFetch();
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [backendUrl]);
+    }, []);
 
     if (deviceView == "list" || deviceView == undefined) {
         return (

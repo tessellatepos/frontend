@@ -1,3 +1,4 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import { useEffect, useRef, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
@@ -9,7 +10,7 @@ type PairingStatus = "UNKNOWN" | "UNPAIRED" | "PAIRED" | "EXPIRED";
 // the terminal's screen, and Square then reports that code as PAIRED along
 // with the terminal's real device_id — the id order checkouts need.
 export default function PairSquareTerminal() {
-    const { setDeviceView, backendUrl } = useSettingsStore();
+    const { setDeviceView } = useSettingsStore();
     const [locations, setLocations] = useState<Location[]>([]);
     const [locationId, setLocationId] = useState("");
     const [name, setName] = useState("");
@@ -24,9 +25,7 @@ export default function PairSquareTerminal() {
     useEffect(() => {
         async function fetchLocations() {
             try {
-                const response = await fetch(
-                    `${backendUrl}/api/v1/square/locations`,
-                );
+                const response = await apiFetch(`/api/v1/square/locations`);
                 if (!response.ok) return;
                 setLocations((await response.json()) as Location[]);
             } catch (err) {
@@ -34,7 +33,7 @@ export default function PairSquareTerminal() {
             }
         }
         void fetchLocations();
-    }, [backendUrl]);
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -44,10 +43,9 @@ export default function PairSquareTerminal() {
 
     async function cancel() {
         if (device) {
-            await fetch(
-                `${backendUrl}/api/v1/config/devices/pair-device/${device.id}`,
-                { method: "DELETE" },
-            );
+            await apiFetch(`/api/v1/config/devices/pair-device/${device.id}`, {
+                method: "DELETE",
+            });
         }
         setDeviceView("list");
     }
@@ -60,8 +58,8 @@ export default function PairSquareTerminal() {
         setError(undefined);
 
         try {
-            const createResponse = await fetch(
-                `${backendUrl}/api/v1/config/devices/pair-device/`,
+            const createResponse = await apiFetch(
+                `/api/v1/config/devices/pair-device/`,
             );
             if (!createResponse.ok) {
                 throw new Error("Failed to create device configuration");
@@ -69,8 +67,8 @@ export default function PairSquareTerminal() {
             const newDevice: IConfigDevice = await createResponse.json();
             setDevice(newDevice);
 
-            const pairingResponse = await fetch(
-                `${backendUrl}/api/v1/config/devices/${newDevice.id}/square-pairing`,
+            const pairingResponse = await apiFetch(
+                `/api/v1/config/devices/${newDevice.id}/square-pairing`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -90,8 +88,8 @@ export default function PairSquareTerminal() {
 
             pollRef.current = setInterval(async () => {
                 try {
-                    const statusResponse = await fetch(
-                        `${backendUrl}/api/v1/config/devices/${newDevice.id}/square-pairing`,
+                    const statusResponse = await apiFetch(
+                        `/api/v1/config/devices/${newDevice.id}/square-pairing`,
                     );
                     if (!statusResponse.ok) return;
                     const { status: pairingStatus }: { status: PairingStatus } =

@@ -1,3 +1,4 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import * as React from "react";
 import { type ReactNode, useEffect } from "react";
 import * as jsxRuntime from "react/jsx-runtime";
@@ -46,9 +47,7 @@ export function PluginLoader({ children }: { children: ReactNode }) {
     useEffect(() => {
         async function discover() {
             try {
-                const res = await fetch(
-                    `${backendUrl}/api/v1/plugins-discovery`,
-                );
+                const res = await apiFetch(`/api/v1/plugins-discovery`);
                 if (!res.ok) {
                     logger.warn("Plugin discovery failed:", res.status);
                     setLoaded(true);
