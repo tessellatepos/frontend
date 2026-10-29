@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { WelcomeStep } from "./WelcomeStep.tsx";
@@ -7,6 +7,7 @@ import { OwnerStep } from "./OwnerStep.tsx";
 import { StoreStep } from "./StoreStep.tsx";
 import { SquareStep } from "./SquareStep.tsx";
 import { DoneStep } from "./DoneStep.tsx";
+import { commonError, postSetup } from "./api.ts";
 
 const STEPS = ["Welcome", "Owner", "Store", "Done"];
 
@@ -21,6 +22,34 @@ export default function Setup() {
     const [token, setToken] = useState("");
     const [passedWelcome, setPassedWelcome] = useState(false);
     const [tokenError, setTokenError] = useState("");
+    const [checking, setChecking] = useState(false);
+    const refresh = useAuthStore((s) => s.refresh);
+    const navigate = useNavigate();
+
+    /** Pre-checks the setup token so a typo is caught on the welcome step. */
+    async function verifyToken() {
+        setTokenError("");
+        if (!setup?.setupTokenRequired) {
+            setPassedWelcome(true);
+            return;
+        }
+        setChecking(true);
+        const result = await postSetup("verify-token", { setupToken: token });
+        setChecking(false);
+        if (result.status === 204) {
+            setPassedWelcome(true);
+        } else if (result.status === 403) {
+            setTokenError(
+                "That setup token is not correct. Check the server log.",
+            );
+        } else if (result.status === 409) {
+            // SETUP_COMPLETE / USER_EXISTS: someone already set this up.
+            await refresh();
+            void navigate("/", { replace: true });
+        } else {
+            setTokenError(commonError(result));
+        }
+    }
 
     if (status === "unknown" || setupNeeded === null || !setup) {
         return (
@@ -78,10 +107,8 @@ export default function Setup() {
                     token={token}
                     onToken={setToken}
                     error={tokenError}
-                    onContinue={() => {
-                        setTokenError("");
-                        setPassedWelcome(true);
-                    }}
+                    busy={checking}
+                    onContinue={() => void verifyToken()}
                 />
             )}
             {step === 1 && (

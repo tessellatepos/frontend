@@ -8,6 +8,8 @@ interface Props {
     onContinue: () => void;
     /** Why the last attempt bounced back here, if it did. */
     error?: string;
+    /** True while the token is being checked. */
+    busy?: boolean;
 }
 
 /** Step 1: welcome and the setup token. */
@@ -17,6 +19,7 @@ export function WelcomeStep({
     onToken,
     onContinue,
     error,
+    busy,
 }: Props) {
     return (
         <form
@@ -44,8 +47,9 @@ export function WelcomeStep({
             )}
             <button
                 type="submit"
-                className="self-start rounded bg-blue-500 px-4 py-2 text-white">
-                Continue
+                disabled={busy}
+                className="self-start rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50">
+                {busy ? "Checking…" : "Continue"}
             </button>
         </form>
     );
