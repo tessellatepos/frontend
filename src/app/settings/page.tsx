@@ -1,6 +1,7 @@
 import { useSettingsStore } from "@/stores/settings/useSettingsStore";
 import Appearance from "@/app/settings/pages/appearance/page";
 import Devices from "@/app/settings/pages/devices/page";
+import SignInMethods from "@/app/settings/pages/sign-in/page";
 import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import {
@@ -8,6 +9,7 @@ import {
     SettingsMenuBar,
 } from "@/components/SettingsMenuBar/";
 import {
+    KeyRound,
     MonitorSmartphone,
     Paintbrush,
     Settings,
@@ -29,6 +31,7 @@ export default function Config() {
         // if (view == "appearance") return <Appearance />;
         if (view == "devices") return <Devices />;
         if (view == "users") return <Users />;
+        if (view == "sign-in") return <SignInMethods />;
     };
 
     const menuItems: ISettingsMenuBarProps[] = [
@@ -58,6 +61,12 @@ export default function Config() {
                       page: <Users />,
                       view: "users",
                       icon: UsersIcon,
+                  },
+                  {
+                      name: "Sign-in methods",
+                      page: <SignInMethods />,
+                      view: "sign-in",
+                      icon: KeyRound,
                   },
               ]
             : []),
