@@ -149,7 +149,10 @@ export default function CartPage() {
                                 <div
                                     key={item.itemId ?? item.name}
                                     className="p-2">
-                                    <CartItem item={item} />
+                                    <CartItem
+                                        item={item}
+                                        editable={false}
+                                    />
                                 </div>
                             ))}
                         </div>

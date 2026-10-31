@@ -14,9 +14,11 @@ import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 type Props = {
     item: CartItemType;
+    /** false on checkout: the order is already created, so show it read-only. */
+    editable?: boolean;
 };
 
-export default function CartItem({ item }: Props) {
+export default function CartItem({ item, editable = true }: Props) {
     const { removeQuantity, removeItem, addQuantity } = useCartStore();
 
     return (
@@ -49,7 +51,15 @@ export default function CartItem({ item }: Props) {
                             </div>
                             <div>
                                 <div>
-                                    {item.quantity != null && (
+                                    {item.quantity != null && !editable && (
+                                        <div className="flex items-center gap-2">
+                                            <span>Quantity:</span>
+                                            <span>
+                                                {item.quantity.toString()}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {item.quantity != null && editable && (
                                         <div className="flex items-center gap-2">
                                             <span>Quantity:</span>
                                             <ButtonGroup>
@@ -74,13 +84,15 @@ export default function CartItem({ item }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <ItemActions>
-                            <button
-                                onClick={() => removeItem(item)}
-                                aria-label={`Remove ${item.name} from cart`}>
-                                <CircleX />
-                            </button>
-                        </ItemActions>
+                        {editable && (
+                            <ItemActions>
+                                <button
+                                    onClick={() => removeItem(item)}
+                                    aria-label={`Remove ${item.name} from cart`}>
+                                    <CircleX />
+                                </button>
+                            </ItemActions>
+                        )}
                     </div>
                 </ItemContent>
             </Item>
