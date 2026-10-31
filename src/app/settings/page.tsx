@@ -5,6 +5,7 @@ import SignInMethods from "@/app/settings/pages/sign-in/page";
 import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
+import ApiCredentials from "@/app/settings/pages/api-credentials/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
 import { isSettingsView } from "@/app/settings/tabs.ts";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/SettingsMenuBar/";
 import {
     KeyRound,
+    Globe,
     MonitorSmartphone,
     Paintbrush,
     Plug,
@@ -87,6 +89,13 @@ export default function Config() {
             page: <SignInMethods />,
             view: "sign-in",
             icon: KeyRound,
+            minRole: "owner",
+        },
+        {
+            name: "API credentials",
+            page: <ApiCredentials />,
+            view: "api-credentials",
+            icon: Globe,
             minRole: "owner",
         },
     ];
