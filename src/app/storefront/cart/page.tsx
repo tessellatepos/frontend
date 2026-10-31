@@ -5,6 +5,7 @@ import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import { Logger } from "tslog";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -108,7 +109,20 @@ export default function CartPage() {
         <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900">
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 p-6 md:grid-cols-[3fr_2fr]">
                 <section className="flex flex-col gap-4">
-                    <h1 className="text-2xl font-semibold">Checkout</h1>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                void navigate(
+                                    deviceId ? `/storefront/${deviceId}` : -1,
+                                )
+                            }>
+                            <ArrowLeft />
+                            Back to items
+                        </Button>
+                        <h1 className="text-2xl font-semibold">Checkout</h1>
+                    </div>
 
                     {loading && !error && (
                         <div className="flex items-center justify-center gap-2 rounded-lg bg-white p-8 text-gray-500 shadow-sm dark:bg-gray-800">
