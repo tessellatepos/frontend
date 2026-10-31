@@ -3,9 +3,14 @@ import type { Location } from "@tessellatepos/sdk";
 import { apiFetch } from "@/utils/apiFetch.ts";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 
+/** A storefront with the id of its LOCAL till, or null when it has none. */
+interface IStorefront extends Location {
+    deviceId: string | null;
+}
+
 interface IStorefrontList {
     canManage: boolean;
-    storefronts: Location[];
+    storefronts: IStorefront[];
 }
 
 export default function Storefronts() {
@@ -136,15 +141,33 @@ export default function Storefronts() {
                                 ({storefront.id}, {storefront.currency})
                             </span>
                         </span>
-                        {list.canManage &&
-                            isOwner &&
-                            storefront.id.startsWith("local-") && (
-                                <button
-                                    className={`text-red-600`}
-                                    onClick={() => void remove(storefront.id)}>
-                                    Delete
-                                </button>
+                        <div className={`flex items-center gap-4`}>
+                            {storefront.deviceId && (
+                                <span className={`flex flex-col items-end`}>
+                                    <a
+                                        className={`text-blue-600`}
+                                        href={`/storefront/${storefront.deviceId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                                        Open till
+                                    </a>
+                                    <span className={`text-xs text-gray-500`}>
+                                        {storefront.deviceId}
+                                    </span>
+                                </span>
                             )}
+                            {list.canManage &&
+                                isOwner &&
+                                storefront.id.startsWith("local-") && (
+                                    <button
+                                        className={`text-red-600`}
+                                        onClick={() =>
+                                            void remove(storefront.id)
+                                        }>
+                                        Delete
+                                    </button>
+                                )}
+                        </div>
                     </li>
                 ))}
                 {list?.storefronts.length === 0 && (

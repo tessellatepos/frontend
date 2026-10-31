@@ -22,7 +22,7 @@ export default function Storefront() {
     const [error, setError] = useState<string | null>(null);
     const [items, setItems] = useState<Item[]>([]);
     const { deviceId } = useParams();
-    const { setLocationId, setDeviceId } = useSettingsStore();
+    const { setLocationId, setDeviceId, setDeviceType } = useSettingsStore();
 
     useEffect(() => {
         async function fetchDeviceConfig(): Promise<string> {
@@ -50,6 +50,10 @@ export default function Storefront() {
                     "No device configurations found in backend response",
                 );
             }
+
+            // A LOCAL till has no hardware, so the payment panel offers cash
+            // only for it.
+            setDeviceType(deviceConfig.device_type ?? "");
 
             // Devices may not pin a location. Fall back to the location of
             // the deployment's Square connection, if it has one, then to the
@@ -123,7 +127,7 @@ export default function Storefront() {
                 setLoading(false);
             }
         })();
-    }, [deviceId, setDeviceId, setLocationId]);
+    }, [deviceId, setDeviceId, setDeviceType, setLocationId]);
 
     return (
         <section className="w-full min-h-screen dark:bg-gray-900">
