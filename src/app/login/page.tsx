@@ -113,6 +113,8 @@ export default function Login() {
         }
     }
 
+    // custom methods (e.g. a plugin's PIN pad) draw their own UI
+    const redirectProviders = providers.filter((p) => p.kind !== "custom");
     const label = providers.find((p) => p.id === params.get("provider"))?.label;
     const providerMessage = !providerError
         ? ""
@@ -164,12 +166,12 @@ export default function Login() {
                     {providerMessage}
                 </p>
             )}
-            {providers.length > 0 && (
+            {redirectProviders.length > 0 && (
                 <div
                     role="group"
                     aria-label="Other ways to sign in"
                     className="flex flex-col gap-2">
-                    {providers.map((p) => (
+                    {redirectProviders.map((p) => (
                         <button
                             key={p.id}
                             type="button"
