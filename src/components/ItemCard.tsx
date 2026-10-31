@@ -143,6 +143,9 @@ export default function ItemCard({ item, parentItem, className = "" }: Props) {
 
         if (variationIndex === 0 && parent?.displayName) {
             titleText = parent.displayName;
+        } else if (!parent && item?.parent?.name) {
+            // a lone variation (usually "Regular") is the item itself
+            titleText = item.parent.name;
         }
 
         if (item?.name === "") {
