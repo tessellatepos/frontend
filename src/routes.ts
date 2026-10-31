@@ -10,6 +10,8 @@ export default [
         layout("app/layout/AppLayout.tsx", [
             route("dashboard", "app/dashboard/page.tsx"),
             route("catalog", "app/catalog/page.tsx"),
+            route("orders", "app/orders/page.tsx"),
+            route("orders/:orderId", "app/orders/detail.tsx"),
             route("settings", "app/settings/page.tsx"),
             route("plugins/:pluginName", "app/plugin-page.tsx"),
         ]),

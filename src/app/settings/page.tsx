@@ -6,6 +6,7 @@ import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
 import ApiCredentials from "@/app/settings/pages/api-credentials/page";
+import Payments from "@/app/settings/pages/payments/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
 import { isSettingsView } from "@/app/settings/tabs.ts";
 import {
@@ -13,6 +14,7 @@ import {
     SettingsMenuBar,
 } from "@/components/SettingsMenuBar/";
 import {
+    CreditCard,
     KeyRound,
     Globe,
     MonitorSmartphone,
@@ -96,6 +98,13 @@ export default function Config() {
             page: <ApiCredentials />,
             view: "api-credentials",
             icon: Globe,
+            minRole: "owner",
+        },
+        {
+            name: "Payments",
+            page: <Payments />,
+            view: "payments",
+            icon: CreditCard,
             minRole: "owner",
         },
     ];

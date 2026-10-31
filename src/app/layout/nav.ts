@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BookOpen, LayoutDashboard, Settings } from "lucide-react";
+import { BookOpen, LayoutDashboard, Receipt, Settings } from "lucide-react";
 import type { Role } from "@/stores/auth/useAuthStore.ts";
 
 export interface NavEntry {
@@ -30,6 +30,12 @@ export const NAV_ENTRIES: NavEntry[] = [
         icon: BookOpen,
         scope: "catalog:read",
         minRole: "manager",
+    },
+    {
+        name: "Online orders",
+        to: "/orders",
+        icon: Receipt,
+        scope: "payments:read",
     },
     {
         name: "Settings",

@@ -59,7 +59,7 @@ export default function AppLayout() {
                         <li key={e.name}>
                             <NavItem
                                 to={e.to}
-                                end
+                                end={e.to !== "/orders"}
                                 label={e.name}
                                 icon={e.icon}
                             />
