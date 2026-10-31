@@ -118,6 +118,9 @@ export default function ItemsView() {
                         <th className="p-2">Price</th>
                         <th className="p-2">Categories</th>
                         <th className="p-2">Status</th>
+                        <th className="p-2">
+                            <span className="sr-only">Actions</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -144,12 +147,21 @@ export default function ItemsView() {
                             <td className="p-2">
                                 {item.isArchived ? "Archived" : "Active"}
                             </td>
+                            <td className="p-2 text-right">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    aria-label={`Edit ${item.name}`}
+                                    onClick={() => openItem(item)}>
+                                    Edit
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                     {!s.loading && s.items.length === 0 && (
                         <tr>
                             <td
-                                colSpan={5}
+                                colSpan={6}
                                 className="p-3 text-gray-500">
                                 No items found.
                             </td>
