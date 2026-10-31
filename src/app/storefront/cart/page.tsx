@@ -114,9 +114,9 @@ export default function CartPage() {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                                void navigate(
-                                    deviceId ? `/storefront/${deviceId}` : -1,
-                                )
+                                deviceId
+                                    ? void navigate(`/storefront/${deviceId}`)
+                                    : void navigate(-1)
                             }>
                             <ArrowLeft />
                             Back to items
