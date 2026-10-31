@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useSearchParams } from "react-router";
 import type { Location } from "@tessellatepos/sdk";
 import { apiFetch } from "@/utils/apiFetch.ts";
@@ -150,14 +151,16 @@ export default function SquareConnection() {
                 <div className={`flex gap-3`}>
                     {status?.authorized ? (
                         <button
-                            className={`bg-red-500 text-white px-4 py-2 rounded disabled:opacity-50`}
+                            className={buttonVariants({
+                                variant: "destructive",
+                            })}
                             disabled={busy}
                             onClick={() => void disconnectSquare()}>
                             Disconnect
                         </button>
                     ) : (
                         <button
-                            className={`bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50`}
+                            className={buttonVariants()}
                             disabled={busy}
                             onClick={() => void connectSquare()}>
                             Connect Square

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import {
@@ -66,7 +67,7 @@ function UsersTable({ myId }: { myId: string }) {
                         setNotice("");
                         setCreating(true);
                     }}
-                    className="rounded bg-blue-500 px-4 py-2 text-white">
+                    className={buttonVariants()}>
                     Add user
                 </button>
             </div>

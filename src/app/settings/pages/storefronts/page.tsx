@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import type { Location } from "@tessellatepos/sdk";
 import { apiFetch } from "@/utils/apiFetch.ts";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
@@ -121,7 +122,7 @@ export default function Storefronts() {
                         />
                     </label>
                     <button
-                        className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                        className={buttonVariants()}
                         type="submit">
                         Create storefront
                     </button>

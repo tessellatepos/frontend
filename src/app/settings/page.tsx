@@ -107,14 +107,15 @@ export default function Config() {
                 className={`flex w-full items-center justify-between py-5 pr-5`}>
                 <span className={`pl-5 text-4xl`}>Settings</span>
             </div>
-            <div className={`grid grid-cols-[2fr_7fr] w-full h-full`}>
+            <div
+                className={`grid grid-cols-[minmax(0,2fr)_minmax(0,7fr)] w-full h-full`}>
                 <div className={`flex w-full`}>
                     <SettingsMenuBar
                         menuItems={menuItems}
                         activeView={current?.view}
                     />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col min-w-0">
                     {current?.page}
                     <PluginHost mount={PluginUIMountPoint.SETTINGS_TAB} />
                 </div>

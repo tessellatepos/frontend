@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button.tsx";
+import { navItemClass } from "@/components/navItemClass.ts";
 import {
     type CatalogSubView,
     useCatalogStore,
@@ -27,8 +27,8 @@ export default function Catalog() {
     }, [loadReference, loadItems]);
 
     return (
-        <div className="flex flex-col gap-4 p-5">
-            <h2 className="text-2xl">Catalog</h2>
+        <div className="flex flex-col gap-5 p-5">
+            <h1 className="text-3xl">Catalog</h1>
             {canManage === false && (
                 <p
                     role="status"
@@ -40,15 +40,15 @@ export default function Catalog() {
             <div
                 role="group"
                 aria-label="Catalog sections"
-                className="flex gap-2">
+                className="flex border-b">
                 {TABS.map((tab) => (
-                    <Button
+                    <button
                         key={tab.view}
-                        variant={subView === tab.view ? "default" : "outline"}
                         aria-pressed={subView === tab.view}
+                        className={navItemClass(subView === tab.view)}
                         onClick={() => setSubView(tab.view)}>
                         {tab.label}
-                    </Button>
+                    </button>
                 ))}
             </div>
             {subView === "items" && <ItemsView />}

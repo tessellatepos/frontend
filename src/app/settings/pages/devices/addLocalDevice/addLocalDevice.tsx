@@ -1,4 +1,5 @@
 import { apiFetch } from "@/utils/apiFetch.ts";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useEffect, useState } from "react";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
@@ -73,7 +74,7 @@ export default function AddLocalDevice() {
                 </a>
                 <p className={`text-sm text-gray-500`}>Device ID: {till.id}</p>
                 <button
-                    className={`bg-blue-500 text-white px-4 py-2 rounded w-fit`}
+                    className={buttonVariants({ className: "w-fit" })}
                     onClick={() => setDeviceView("list")}>
                     Back to devices
                 </button>
@@ -117,13 +118,13 @@ export default function AddLocalDevice() {
             {error && <p className={`text-red-600`}>{error}</p>}
             <div className={`flex gap-2`}>
                 <button
-                    className={`bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50`}
+                    className={buttonVariants()}
                     disabled={!locationId || submitting}
                     type="submit">
                     Create till
                 </button>
                 <button
-                    className={`px-4 py-2 rounded border`}
+                    className={buttonVariants({ variant: "outline" })}
                     onClick={() => setDeviceView("list")}
                     type="button">
                     Cancel
