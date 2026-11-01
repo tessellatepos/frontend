@@ -1,4 +1,5 @@
 import { apiFetch } from "@/utils/apiFetch.ts";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useEffect, useState } from "react";
 import type { IConfigDevice } from "@tessellatepos/sdk";
@@ -70,7 +71,7 @@ export default function AddDevice() {
         <div>
             <div className={`flex flex-col`}>
                 <button
-                    className={`bg-red-500 text-white px-4 py-2 rounded`}
+                    className={buttonVariants({ variant: "destructive" })}
                     onClick={() => cancelPairing(deviceConfig!.id)}>
                     Cancel Pairing
                 </button>

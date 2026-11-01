@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { FormField } from "@/components/FormField.tsx";
@@ -88,7 +89,7 @@ function ProviderList() {
                         <button
                             onClick={() => setSelectedId(p.id)}
                             aria-label={`Edit ${p.label}`}
-                            className="rounded border px-3 py-1">
+                            className={buttonVariants({ variant: "outline" })}>
                             Edit
                         </button>
                     </li>
@@ -219,7 +220,7 @@ function ProviderEditor({
                     <button
                         type="button"
                         onClick={() => setReplacing(true)}
-                        className="rounded border px-3 py-1">
+                        className={buttonVariants({ variant: "outline" })}>
                         Replace secret
                     </button>
                 </div>
@@ -264,7 +265,7 @@ function ProviderEditor({
             <button
                 type="submit"
                 disabled={busy}
-                className="self-start rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50">
+                className={buttonVariants({ className: "self-start" })}>
                 {busy ? "Saving…" : "Save"}
             </button>
         </form>

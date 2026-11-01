@@ -1,4 +1,5 @@
 import { apiFetch } from "@/utils/apiFetch.ts";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import { useEffect, useRef, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
@@ -146,12 +147,14 @@ export default function PairSquareTerminal() {
                     {error && <p className={`text-red-600`}>{error}</p>}
                     <div className={`flex gap-2`}>
                         <button
-                            className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                            className={buttonVariants()}
                             onClick={() => void generateCode()}>
                             Generate pairing code
                         </button>
                         <button
-                            className={`bg-red-500 text-white px-4 py-2 rounded`}
+                            className={buttonVariants({
+                                variant: "destructive",
+                            })}
                             onClick={() => void cancel()}>
                             Cancel
                         </button>
@@ -174,7 +177,7 @@ export default function PairSquareTerminal() {
                     <div className={`flex gap-2`}>
                         {status === "EXPIRED" && (
                             <button
-                                className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                                className={buttonVariants()}
                                 onClick={() => {
                                     setCode(undefined);
                                     setStatus(undefined);
@@ -183,7 +186,9 @@ export default function PairSquareTerminal() {
                             </button>
                         )}
                         <button
-                            className={`bg-red-500 text-white px-4 py-2 rounded`}
+                            className={buttonVariants({
+                                variant: "destructive",
+                            })}
                             onClick={() => void cancel()}>
                             Cancel
                         </button>

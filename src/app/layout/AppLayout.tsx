@@ -1,14 +1,12 @@
-import { Navigate, NavLink, Outlet, useNavigate } from "react-router";
+import { Navigate, Outlet, useNavigate } from "react-router";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { Puzzle } from "lucide-react";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { usePluginStore } from "@/stores/plugins/pluginStore.ts";
 import { meetsRole, roleHasScope } from "@/utils/scopes.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { NavItem } from "@/components/NavItem.tsx";
 import { NAV_ENTRIES } from "./nav.ts";
-
-const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-4 py-3 hover:bg-blue-200 ${isActive ? "font-semibold" : ""}`;
 
 /**
  * Shell for the admin side: navigation filtered by what the signed-in role
@@ -57,28 +55,23 @@ export default function AppLayout() {
                 aria-label="Main"
                 className="flex flex-col justify-between border-r">
                 <ul>
-                    {entries.map((e) => {
-                        const Icon = e.icon;
-                        return (
-                            <li key={e.name}>
-                                <NavLink
-                                    to={e.to}
-                                    end
-                                    className={linkClass}>
-                                    <Icon className="size-5" />
-                                    <span>{e.name}</span>
-                                </NavLink>
-                            </li>
-                        );
-                    })}
+                    {entries.map((e) => (
+                        <li key={e.name}>
+                            <NavItem
+                                to={e.to}
+                                end
+                                label={e.name}
+                                icon={e.icon}
+                            />
+                        </li>
+                    ))}
                     {pluginPages.map((name) => (
                         <li key={name}>
-                            <NavLink
+                            <NavItem
                                 to={`/plugins/${name}`}
-                                className={linkClass}>
-                                <Puzzle className="size-5" />
-                                <span>{name}</span>
-                            </NavLink>
+                                label={name}
+                                icon={Puzzle}
+                            />
                         </li>
                     ))}
                 </ul>
@@ -103,7 +96,7 @@ export default function AppLayout() {
                     )}
                 </div>
             </nav>
-            <main>
+            <main className="min-w-0">
                 <Outlet />
             </main>
         </div>

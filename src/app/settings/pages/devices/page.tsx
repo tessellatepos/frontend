@@ -1,4 +1,5 @@
 import { apiFetch } from "@/utils/apiFetch.ts";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
@@ -98,22 +99,23 @@ export default function Devices() {
 
     if (deviceView == "list" || deviceView == undefined) {
         return (
-            <div className={`flex p-5 w-full h-full flex-col`}>
+            <div className={`flex p-5 w-full h-full flex-col gap-5`}>
+                <h1 className={`text-2xl`}>Devices</h1>
                 {/* header */}
                 <div className={`flex gap-2`}>
                     <button
-                        className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                        className={buttonVariants()}
                         onClick={() => setDeviceView("add")}>
                         Pair new device
                     </button>
                     <button
-                        className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                        className={buttonVariants()}
                         onClick={() => setDeviceView("pair-terminal")}>
                         Pair Square Terminal
                     </button>
                     {isOwner && (
                         <button
-                            className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                            className={buttonVariants()}
                             onClick={() => setDeviceView("add-local")}>
                             Add local till
                         </button>
@@ -126,8 +128,7 @@ export default function Devices() {
                     </div>
                 )}
                 {/* device list */}
-                <div
-                    className={`flex-1 p-5 w-full flex-col rounded-2xl bg-gray-400 m-5`}>
+                <div className={`w-full overflow-x-auto rounded border p-4`}>
                     <table className={`w-full border-spacing-2`}>
                         <thead>
                             <tr

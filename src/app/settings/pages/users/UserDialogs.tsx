@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import { buttonVariants } from "@/components/ui/button.tsx";
 import {
     Dialog,
     DialogContent,
@@ -176,13 +177,13 @@ function CreateUserForm({ onClose, onCreated }: Omit<CreateProps, "open">) {
                 <button
                     type="button"
                     onClick={onClose}
-                    className="rounded border px-4 py-2">
+                    className={buttonVariants({ variant: "outline" })}>
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={busy}
-                    className="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50">
+                    className={buttonVariants()}>
                     {busy ? "Creating…" : "Create user"}
                 </button>
             </DialogFooter>
@@ -283,13 +284,13 @@ function ResetPasswordForm({
                 <button
                     type="button"
                     onClick={onClose}
-                    className="rounded border px-4 py-2">
+                    className={buttonVariants({ variant: "outline" })}>
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={busy}
-                    className="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50">
+                    className={buttonVariants()}>
                     {busy ? "Saving…" : "Set password"}
                 </button>
             </DialogFooter>
