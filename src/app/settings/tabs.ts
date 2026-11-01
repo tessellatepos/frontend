@@ -20,6 +20,9 @@ export function isSettingsView(value: string | null): value is SettingsView {
     return SETTINGS_VIEWS.some((view) => view === value);
 }
 
-export function settingsPath(view: SettingsView): string {
-    return `/settings?tab=${view}`;
+/** Plugin SETTINGS_TAB registrations get a `plugin:<key>` view. */
+export const PLUGIN_VIEW_PREFIX = "plugin:";
+
+export function settingsPath(view: string): string {
+    return `/settings?tab=${encodeURIComponent(view)}`;
 }

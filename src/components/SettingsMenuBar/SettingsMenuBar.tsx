@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import { type SettingsView, settingsPath } from "@/app/settings/tabs.ts";
+import { settingsPath } from "@/app/settings/tabs.ts";
 import { NavItem } from "@/components/NavItem.tsx";
 import type { ISettingsMenuBarProps } from "./SettingsMenuBar.types";
 
@@ -13,12 +13,12 @@ export default function SettingsMenuBar({
     activeView,
 }: Props): JSX.Element {
     return (
-        <div className="flex-1 w-full min-h-screen">
+        <div className="flex-1 w-full">
             <ul>
                 {menuItems.map((item) => (
                     <li key={item.name}>
                         <NavItem
-                            to={settingsPath(item.view as SettingsView)}
+                            to={settingsPath(item.view)}
                             label={item.name}
                             icon={item.icon}
                             active={activeView === item.view}

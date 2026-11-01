@@ -138,7 +138,9 @@ function ProviderEditor({
         setBusy(true);
         setMessage("");
         setError("");
-        const update: ProviderUpdate = { enabled, clientId };
+        // A custom method (a plugin's own) has no settings, only on/off.
+        const update: ProviderUpdate = { enabled };
+        if (provider.kind !== "custom") update.clientId = clientId;
         if (provider.kind === "oidc") update.discoveryUrl = discoveryUrl;
         if (scopes.trim()) {
             update.scopes = scopes

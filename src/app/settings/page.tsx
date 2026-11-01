@@ -8,7 +8,7 @@ import Providers from "@/app/settings/pages/providers/page";
 import ApiCredentials from "@/app/settings/pages/api-credentials/page";
 import Payments from "@/app/settings/pages/payments/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
-import { isSettingsView } from "@/app/settings/tabs.ts";
+import { PLUGIN_VIEW_PREFIX, isSettingsView } from "@/app/settings/tabs.ts";
 import {
     type ISettingsMenuBarProps,
     SettingsMenuBar,
@@ -20,6 +20,7 @@ import {
     MonitorSmartphone,
     Paintbrush,
     Plug,
+    Puzzle,
     Settings,
     Store,
     Users as UsersIcon,
@@ -28,11 +29,13 @@ import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { meetsRole } from "@/utils/scopes.ts";
 import { PluginHost } from "@/plugin-host/PluginHost.tsx";
+import { usePluginMounts } from "@/plugin-host/usePluginMounts.ts";
 
 export default function Config() {
     const [params] = useSearchParams();
     const user = useAuthStore((s) => s.user);
     const tab = params.get("tab");
+    const pluginTabs = usePluginMounts(PluginUIMountPoint.SETTINGS_TAB);
 
     // Catalog is a sidebar work area now; old links to its tab still work.
     if (tab === "catalog")
@@ -109,13 +112,32 @@ export default function Config() {
         },
     ];
 
-    const menuItems = allMenuItems.filter((item) =>
+    // Plugin tabs can show anything, so they are owner-only.
+    const pluginMenuItems: ISettingsMenuBarProps[] = pluginTabs.map(
+        ({ key, pluginName, def }) => ({
+            name: def.label ?? pluginName,
+            page: (
+                <PluginHost
+                    mount={PluginUIMountPoint.SETTINGS_TAB}
+                    entryKey={key}
+                />
+            ),
+            view: `${PLUGIN_VIEW_PREFIX}${key}`,
+            icon: Puzzle,
+            minRole: "owner",
+        }),
+    );
+
+    const menuItems = [...allMenuItems, ...pluginMenuItems].filter((item) =>
         meetsRole(user?.role, item.minRole),
     );
 
     // An unknown or missing tab shows General. A restricted tab named in the
     // URL falls back to the first tab the role may see.
-    const requested = isSettingsView(tab) ? tab : "general";
+    const requested =
+        isSettingsView(tab) || tab?.startsWith(PLUGIN_VIEW_PREFIX)
+            ? tab
+            : "general";
     const current =
         menuItems.find((item) => item.view === requested) ?? menuItems[0];
 
@@ -133,10 +155,7 @@ export default function Config() {
                         activeView={current?.view}
                     />
                 </div>
-                <div className="flex flex-col min-w-0">
-                    {current?.page}
-                    <PluginHost mount={PluginUIMountPoint.SETTINGS_TAB} />
-                </div>
+                <div className="flex flex-col min-w-0">{current?.page}</div>
             </div>
         </div>
     );
