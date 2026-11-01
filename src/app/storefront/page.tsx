@@ -1,4 +1,5 @@
 "use client";
+import { apiFetch, setStoredDeviceId } from "@/utils/apiFetch.ts";
 import { useEffect, useState } from "react";
 import type { CartItem, Item } from "@tessellatepos/sdk";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
@@ -21,7 +22,7 @@ export default function Storefront() {
     const [error, setError] = useState<string | null>(null);
     const [items, setItems] = useState<Item[]>([]);
     const { deviceId } = useParams();
-    const { setLocationId, backendUrl, setDeviceId } = useSettingsStore();
+    const { setLocationId, setDeviceId } = useSettingsStore();
 
     useEffect(() => {
         async function fetchDeviceConfig(): Promise<string> {
@@ -30,9 +31,10 @@ export default function Storefront() {
             }
 
             setDeviceId(deviceId);
+            setStoredDeviceId(deviceId);
 
-            const response = await fetch(
-                `${backendUrl}/api/v1/config/devices/${deviceId}`,
+            const response = await apiFetch(
+                `/api/v1/config/devices/${deviceId}`,
             );
 
             if (!response.ok) {
@@ -54,8 +56,8 @@ export default function Storefront() {
             // only location when there's just one.
             let location = deviceConfig.square_location;
             if (!location) {
-                const statusResponse = await fetch(
-                    `${backendUrl}/api/v1/square/oauth/status`,
+                const statusResponse = await apiFetch(
+                    `/api/v1/square/oauth/status`,
                 );
                 if (statusResponse.ok) {
                     location =
@@ -68,9 +70,7 @@ export default function Storefront() {
             }
 
             if (!location) {
-                const locationsResponse = await fetch(
-                    `${backendUrl}/api/v1/locations`,
-                );
+                const locationsResponse = await apiFetch(`/api/v1/locations`);
                 if (locationsResponse.ok) {
                     const locations =
                         (await locationsResponse.json()) as Location[];
@@ -92,8 +92,8 @@ export default function Storefront() {
         async function fetchItemsResponse() {
             const locationId = await fetchDeviceConfig();
             setLoading(true);
-            const response = await fetch(
-                `${backendUrl}/api/v1/items/by-location/${locationId}`,
+            const response = await apiFetch(
+                `/api/v1/items/by-location/${locationId}`,
             );
             if (!response.ok) {
                 throw new Error("Failed to fetch items from backend");
@@ -123,7 +123,7 @@ export default function Storefront() {
                 setLoading(false);
             }
         })();
-    }, [deviceId, backendUrl, setDeviceId, setLocationId]);
+    }, [deviceId, setDeviceId, setLocationId]);
 
     return (
         <section className="w-full min-h-screen dark:bg-gray-900">

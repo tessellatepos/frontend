@@ -1,25 +1,21 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { useEffect, useState } from "react";
 import type { IConfigDevice } from "@tessellatepos/sdk";
 
 export default function AddDevice() {
-    const { setDeviceView, backendUrl } = useSettingsStore();
+    const { setDeviceView } = useSettingsStore();
     const [deviceConfig, setDeviceConfig] = useState<IConfigDevice>();
 
     async function cancelPairing(deviceID: string) {
-        await fetch(
-            `${backendUrl}/api/v1/config/devices/pair-device/${deviceID}`,
-            {
-                method: "DELETE",
-            },
-        );
+        await apiFetch(`/api/v1/config/devices/pair-device/${deviceID}`, {
+            method: "DELETE",
+        });
         setDeviceView("list");
     }
 
     async function fetchDeviceConfigs() {
-        const response = await fetch(
-            `${backendUrl}/api/v1/config/devices/pair-device/`,
-        );
+        const response = await apiFetch(`/api/v1/config/devices/pair-device/`);
 
         if (!response.ok) {
             throw new Error(
@@ -43,7 +39,6 @@ export default function AddDevice() {
             await fetchDeviceConfigs();
         };
         void doFetch();
-        //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // The mobile app completes pairing by hitting PUT /pair-device/:code on
@@ -54,8 +49,8 @@ export default function AddDevice() {
 
         const poll = setInterval(async () => {
             try {
-                const response = await fetch(
-                    `${backendUrl}/api/v1/config/devices/${deviceConfig.id}`,
+                const response = await apiFetch(
+                    `/api/v1/config/devices/${deviceConfig.id}`,
                 );
                 if (!response.ok) return;
                 const config: IConfigDevice | null = await response.json();
@@ -70,7 +65,7 @@ export default function AddDevice() {
 
         return () => clearInterval(poll);
         //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [deviceConfig?.id, backendUrl]);
+    }, [deviceConfig?.id]);
     return (
         <div>
             <div className={`flex flex-col`}>

@@ -1,7 +1,7 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { Location } from "@tessellatepos/sdk";
-import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 
 interface ISquareAuthStatus {
     authorized: boolean;
@@ -11,7 +11,6 @@ interface ISquareAuthStatus {
 }
 
 export default function SettingsHome() {
-    const { backendUrl } = useSettingsStore();
     const [searchParams, setSearchParams] = useSearchParams();
     const [status, setStatus] = useState<ISquareAuthStatus>();
     const [locationName, setLocationName] = useState<string>();
@@ -24,9 +23,7 @@ export default function SettingsHome() {
 
     const fetchStatus = useCallback(async () => {
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/square/oauth/status`,
-            );
+            const response = await apiFetch(`/api/v1/square/oauth/status`);
             if (!response.ok) {
                 throw new Error(`status endpoint returned ${response.status}`);
             }
@@ -34,8 +31,8 @@ export default function SettingsHome() {
             setStatus(authStatus);
 
             if (authStatus.locationId) {
-                const locationResponse = await fetch(
-                    `${backendUrl}/api/v1/locations/${authStatus.locationId}`,
+                const locationResponse = await apiFetch(
+                    `/api/v1/locations/${authStatus.locationId}`,
                 );
                 if (locationResponse.ok) {
                     setLocationName(
@@ -47,7 +44,7 @@ export default function SettingsHome() {
             console.error("Failed to read Square connection status", err);
             setErrorMessage("Could not read the Square connection status.");
         }
-    }, [backendUrl]);
+    }, []);
 
     useEffect(() => {
         const doFetch = async () => {
@@ -69,9 +66,7 @@ export default function SettingsHome() {
         setErrorMessage("");
         clearCallbackOutcome();
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/square/oauth/authorize`,
-            );
+            const response = await apiFetch(`/api/v1/square/oauth/authorize`);
             if (!response.ok) {
                 throw new Error(`authorize returned ${response.status}`);
             }
@@ -92,10 +87,9 @@ export default function SettingsHome() {
         setMessage("");
         clearCallbackOutcome();
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/square/oauth/revoke`,
-                { method: "POST" },
-            );
+            const response = await apiFetch(`/api/v1/square/oauth/revoke`, {
+                method: "POST",
+            });
             if (!response.ok) {
                 throw new Error(`revoke returned ${response.status}`);
             }

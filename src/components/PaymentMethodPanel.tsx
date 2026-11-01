@@ -1,3 +1,4 @@
+import { apiFetch } from "@/utils/apiFetch.ts";
 import { useEffect, useRef, useState } from "react";
 import { Logger } from "tslog";
 import type { Order } from "@tessellatepos/sdk";
@@ -29,7 +30,6 @@ type Stage =
 
 type Props = {
     order: Order;
-    backendUrl: string;
     onPaid: (
         order: Order,
         method: PaymentMethod,
@@ -43,11 +43,7 @@ function jsonBody(body: unknown) {
     );
 }
 
-export default function PaymentMethodPanel({
-    order,
-    backendUrl,
-    onPaid,
-}: Props) {
+export default function PaymentMethodPanel({ order, onPaid }: Props) {
     const [stage, setStage] = useState<Stage>("select");
     const [amountTendered, setAmountTendered] = useState<string>("");
     const [submitting, setSubmitting] = useState<boolean>(false);
@@ -76,8 +72,8 @@ export default function PaymentMethodPanel({
             }
             const tenderedCents = BigInt(Math.round(tenderedDollars * 100));
 
-            const response = await fetch(
-                `${backendUrl}/api/v1/orders/${order.id}/pay-cash`,
+            const response = await apiFetch(
+                `/api/v1/orders/${order.id}/pay-cash`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -105,8 +101,8 @@ export default function PaymentMethodPanel({
 
     async function pollTerminalStatus(checkoutId: string) {
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/orders/${order.id}/checkout/${checkoutId}`,
+            const response = await apiFetch(
+                `/api/v1/orders/${order.id}/checkout/${checkoutId}`,
             );
             if (!response.ok) {
                 throw new Error(`status endpoint returned ${response.status}`);
@@ -138,8 +134,8 @@ export default function PaymentMethodPanel({
         setStage("terminal-waiting");
         setErrorMessage("");
         try {
-            const response = await fetch(
-                `${backendUrl}/api/v1/orders/${order.id}/checkout`,
+            const response = await apiFetch(
+                `/api/v1/orders/${order.id}/checkout`,
                 { method: "POST" },
             );
             if (!response.ok) {
@@ -172,8 +168,8 @@ export default function PaymentMethodPanel({
 
         async function confirmMobileReaderPayment(paymentId: string) {
             try {
-                const response = await fetch(
-                    `${backendUrl}/api/v1/orders/${order.id}/pay-mobile-reader`,
+                const response = await apiFetch(
+                    `/api/v1/orders/${order.id}/pay-mobile-reader`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -231,7 +227,7 @@ export default function PaymentMethodPanel({
                 handleBridgeMessage as EventListener,
             );
         };
-    }, [stage, backendUrl, order, onPaid]);
+    }, [stage, order, onPaid]);
 
     function startMobileReaderPayment() {
         setStage("mobile-waiting");

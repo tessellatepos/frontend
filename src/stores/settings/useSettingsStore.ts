@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
-export type SettingsView = "general" | "appearance" | "devices";
+export type SettingsView =
+    "general" | "appearance" | "devices" | "users" | "sign-in";
 export type DeviceView = "list" | "add" | "pair-terminal";
 
 interface SettingsState {

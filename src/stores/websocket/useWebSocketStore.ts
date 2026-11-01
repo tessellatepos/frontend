@@ -1,6 +1,39 @@
 import { create } from "zustand";
 import { useEffect } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
+import { getDeviceToken } from "@/utils/apiFetch.ts";
+
+/** Longest wait between reconnect attempts. */
+export const MAX_RECONNECT_DELAY_MS = 30_000;
+const BASE_RECONNECT_DELAY_MS = 3_000;
+
+/**
+ * The WebSocket URL for a backend. Browsers cannot set Authorization on a
+ * WebSocket, so a device token travels as the `access_token` query parameter;
+ * without one the staff session cookie authenticates the (same-origin) upgrade.
+ */
+export function buildWsUrl(
+    backendUrl: string,
+    origin: string,
+    deviceToken: string | null,
+): string {
+    const base = new URL(backendUrl || origin);
+    base.protocol = base.protocol === "https:" ? "wss:" : "ws:";
+    base.pathname = "/ws";
+    base.search = "";
+    return (
+        base.href +
+        (deviceToken ? `?access_token=${encodeURIComponent(deviceToken)}` : "")
+    );
+}
+
+/** Reconnect wait after `attempt` consecutive failures: 3s doubling, capped. */
+export function reconnectDelay(attempt: number): number {
+    return Math.min(
+        BASE_RECONNECT_DELAY_MS * 2 ** attempt,
+        MAX_RECONNECT_DELAY_MS,
+    );
+}
 
 export type PaymentStatusPayload = {
     orderId: string;
@@ -41,19 +74,22 @@ export function useWebSocketConnection() {
     useEffect(() => {
         // Same origin unless an absolute backend URL is configured; the
         // socket always lives at /ws.
-        const base = new URL(backendUrl || window.location.origin);
-        base.protocol = base.protocol === "https:" ? "wss:" : "ws:";
-        base.pathname = "/ws";
-        const wsUrl = base.href;
+        const wsUrl = buildWsUrl(
+            backendUrl,
+            window.location.origin,
+            getDeviceToken(),
+        );
 
         let ws: WebSocket | null = null;
         let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
         let stopped = false;
+        let attempt = 0;
 
         const connect = () => {
             ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
+                attempt = 0;
                 setConnected(true);
             };
 
@@ -71,8 +107,8 @@ export function useWebSocketConnection() {
             ws.onclose = () => {
                 if (stopped) return;
                 setConnected(false);
-                // Reconnect after a short delay.
-                reconnectTimer = setTimeout(connect, 3000);
+                // Back off so a rejected upgrade is not retried in a tight loop.
+                reconnectTimer = setTimeout(connect, reconnectDelay(attempt++));
             };
 
             ws.onerror = () => {
