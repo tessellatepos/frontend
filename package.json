@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "trap 'exit 0' INT TERM; react-router dev --host",
         "build": "tsc -b && react-router build",
-        "lint": "prettier . && eslint .",
+        "lint": "prettier --check . && eslint .",
         "lint:fix": "prettier . --write && eslint . --fix",
         "preview": "vite preview",
         "prepare": "husky"
