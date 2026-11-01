@@ -13,7 +13,7 @@ export default function SettingsMenuBar({
     activeView,
 }: Props): JSX.Element {
     return (
-        <div className="flex-1 w-full min-h-screen">
+        <div className="flex-1 w-full">
             <ul>
                 {menuItems.map((item) => (
                     <li key={item.name}>
