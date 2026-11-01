@@ -1,11 +1,12 @@
 FROM node:24-alpine AS builder
+RUN npm install -g pnpm@11.24.0
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install --ignore-scripts --legacy-peer-deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # Serve the static SPA (react-router ssr:false emits build/client)
 FROM nginx:stable-alpine AS production
