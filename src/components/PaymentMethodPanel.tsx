@@ -93,9 +93,10 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
                 return;
             }
 
-            const paidOrder: Order = await response.json();
+            // pay-cash answers { order, changeDue }
+            const body: { order?: Order } = await response.json();
             const changeDueCents = tenderedCents - totalCents;
-            onPaid(paidOrder ?? order, "CASH", changeDueCents);
+            onPaid(body.order ?? order, "CASH", changeDueCents);
         } catch (err) {
             logger.error("Cash payment failed", err);
             setErrorMessage("Cash payment failed — check backend logs");
