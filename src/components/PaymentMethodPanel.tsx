@@ -15,6 +15,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { convertCentsToDollars, toBigIntAmount } from "@tessellatepos/sdk";
 import type { PaymentMethod } from "@/stores/order/useOrdersStore.ts";
+import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 
 const logger = new Logger();
 
@@ -51,6 +52,9 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
     const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
         undefined,
     );
+    const deviceId = useSettingsStore((s) => s.deviceId);
+    // A LOCAL till has no card hardware, so it offers cash only.
+    const isLocalTill = useSettingsStore((s) => s.deviceType) === "LOCAL";
 
     const totalCents = toBigIntAmount(order.totalMoney?.amount);
 
@@ -136,7 +140,11 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
         try {
             const response = await apiFetch(
                 `/api/v1/orders/${order.id}/checkout`,
-                { method: "POST" },
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: jsonBody({ deviceId }),
+                },
             );
             if (!response.ok) {
                 setStage("terminal-failed");
@@ -173,7 +181,7 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: jsonBody({ paymentId }),
+                        body: jsonBody({ paymentId, deviceId }),
                     },
                 );
                 if (!response.ok) {
@@ -227,7 +235,7 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
                 handleBridgeMessage as EventListener,
             );
         };
-    }, [stage, order, onPaid]);
+    }, [stage, order, onPaid, deviceId]);
 
     function startMobileReaderPayment() {
         setStage("mobile-waiting");
@@ -259,12 +267,17 @@ export default function PaymentMethodPanel({ order, onPaid }: Props) {
                 <p className="font-medium">Select payment method</p>
                 <div className="flex flex-col gap-2 sm:flex-row">
                     <Button onClick={() => setStage("cash")}>Cash</Button>
-                    <Button onClick={() => void startTerminalCheckout()}>
-                        Card — Terminal
-                    </Button>
-                    <Button onClick={() => startMobileReaderPayment()}>
-                        Card — Mobile Reader
-                    </Button>
+                    {!isLocalTill && (
+                        <>
+                            <Button
+                                onClick={() => void startTerminalCheckout()}>
+                                Card — Terminal
+                            </Button>
+                            <Button onClick={() => startMobileReaderPayment()}>
+                                Card — Mobile Reader
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
         );

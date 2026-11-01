@@ -2,12 +2,15 @@ import { apiFetch } from "@/utils/apiFetch.ts";
 import type { IConfigDevice, Location } from "@tessellatepos/sdk";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
+import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import AddDevice from "@/app/settings/pages/devices/addDevice/addDevice.tsx";
 import PairSquareTerminal from "@/app/settings/pages/devices/pairSquareTerminal/pairSquareTerminal.tsx";
+import AddLocalDevice from "@/app/settings/pages/devices/addLocalDevice/addLocalDevice.tsx";
 
 export default function Devices() {
     // configDotenv();
     const { deviceView, setDeviceView } = useSettingsStore();
+    const isOwner = useAuthStore((s) => s.user?.role === "owner");
     const [deviceConfigs, setDeviceConfigs] = useState<IConfigDevice[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -89,7 +92,9 @@ export default function Devices() {
             }
         };
         void doFetch();
-    }, []);
+        // Refetch when returning to the list, so a device made in another
+        // view shows up.
+    }, [deviceView]);
 
     if (deviceView == "list" || deviceView == undefined) {
         return (
@@ -106,6 +111,13 @@ export default function Devices() {
                         onClick={() => setDeviceView("pair-terminal")}>
                         Pair Square Terminal
                     </button>
+                    {isOwner && (
+                        <button
+                            className={`bg-blue-500 text-white px-4 py-2 rounded`}
+                            onClick={() => setDeviceView("add-local")}>
+                            Add local till
+                        </button>
+                    )}
                 </div>
                 {/* error banner */}
                 {error && (
@@ -133,17 +145,32 @@ export default function Devices() {
                                 <tr
                                     className={``}
                                     key={config.id}>
-                                    <td className={`py-2`}>{config.id}</td>
+                                    <td className={`py-2`}>
+                                        {config.id}
+                                        {config.device_type === "LOCAL" && (
+                                            <span
+                                                className={`ml-2 text-xs bg-green-600 text-white rounded px-2 py-0.5`}>
+                                                Local
+                                            </span>
+                                        )}
+                                    </td>
                                     <td>
                                         {new Date(
                                             config.created_at,
                                         ).toLocaleString()}
                                     </td>
-                                    <td>{config.pairing_code}</td>
+                                    {/* A LOCAL till has no pairing code. */}
                                     <td>
-                                        {new Date(
-                                            config.code_created_at,
-                                        ).toLocaleString()}
+                                        {config.device_type === "LOCAL"
+                                            ? "None (local till)"
+                                            : config.pairing_code}
+                                    </td>
+                                    <td>
+                                        {config.code_created_at
+                                            ? new Date(
+                                                  config.code_created_at,
+                                              ).toLocaleString()
+                                            : "—"}
                                     </td>
                                     <td>
                                         {config.paired_at
@@ -178,10 +205,12 @@ export default function Devices() {
                                     </td>
                                     <td>{config.device_hardware_id}</td>
                                     <td>
-                                        {config.square_device_id ??
-                                            (config.square_device_code_id
-                                                ? "Pairing..."
-                                                : "Not paired")}
+                                        {config.device_type === "LOCAL"
+                                            ? "Not applicable"
+                                            : (config.square_device_id ??
+                                              (config.square_device_code_id
+                                                  ? "Pairing..."
+                                                  : "Not paired"))}
                                     </td>
                                 </tr>
                             ))}
@@ -204,6 +233,14 @@ export default function Devices() {
         return (
             <div className={`flex p-5 w-full`}>
                 <PairSquareTerminal />
+            </div>
+        );
+    }
+
+    if (deviceView == "add-local") {
+        return (
+            <div className={`flex p-5 w-full`}>
+                <AddLocalDevice />
             </div>
         );
     }

@@ -1,8 +1,15 @@
 import { create } from "zustand";
+import type { DeviceType } from "@tessellatepos/sdk";
 
 export type SettingsView =
-    "general" | "appearance" | "devices" | "users" | "sign-in";
-export type DeviceView = "list" | "add" | "pair-terminal";
+    | "general"
+    | "appearance"
+    | "devices"
+    | "users"
+    | "sign-in"
+    | "storefronts"
+    | "providers";
+export type DeviceView = "list" | "add" | "pair-terminal" | "add-local";
 
 interface SettingsState {
     view: SettingsView;
@@ -15,6 +22,9 @@ interface SettingsState {
     setBackendURL: (backendUrl: string) => void;
     deviceId: string;
     setDeviceId: (deviceId: string) => void;
+    /** The till's device type; empty until the till has loaded its device. */
+    deviceType: DeviceType | "";
+    setDeviceType: (deviceType: DeviceType | "") => void;
 }
 
 /**
@@ -37,4 +47,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     setBackendURL: (backendURL) => set({ backendUrl: backendURL }),
     deviceId: "",
     setDeviceId: (deviceId) => set({ deviceId }),
+    deviceType: "",
+    setDeviceType: (deviceType) => set({ deviceType }),
 }));

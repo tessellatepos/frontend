@@ -4,6 +4,8 @@ import Devices from "@/app/settings/pages/devices/page";
 import SignInMethods from "@/app/settings/pages/sign-in/page";
 import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
+import Providers from "@/app/settings/pages/providers/page";
+import Storefronts from "@/app/settings/pages/storefronts/page";
 import {
     type ISettingsMenuBarProps,
     SettingsMenuBar,
@@ -12,13 +14,30 @@ import {
     KeyRound,
     MonitorSmartphone,
     Paintbrush,
+    Plug,
     Settings,
+    Store,
     Users as UsersIcon,
 } from "lucide-react";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
-import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
+import { type Role, useAuthStore } from "@/stores/auth/useAuthStore.ts";
 import { useNavigate } from "react-router";
 import { PluginHost } from "@/plugin-host/PluginHost.tsx";
+
+/** Higher rank can open everything a lower rank can. */
+const ROLE_RANK: Record<Role, number> = {
+    viewer: 0,
+    cashier: 1,
+    manager: 2,
+    owner: 3,
+};
+
+/** Whether the signed-in role meets a tab's minimum; no role meets none. */
+function meetsRole(role: Role | null | undefined, minRole?: Role): boolean {
+    if (!minRole) return true;
+    if (!role) return false;
+    return ROLE_RANK[role] >= ROLE_RANK[minRole];
+}
 
 export default function Config() {
     const { view } = useSettingsStore();
@@ -27,15 +46,9 @@ export default function Config() {
     const signOutError = useAuthStore((s) => s.signOutError);
     const navigate = useNavigate();
 
-    const settingsPage = () => {
-        if (view == undefined || view == "general") return <SettingsHome />;
-        // if (view == "appearance") return <Appearance />;
-        if (view == "devices") return <Devices />;
-        if (view == "users") return <Users />;
-        if (view == "sign-in") return <SignInMethods />;
-    };
-
-    const menuItems: ISettingsMenuBarProps[] = [
+    // The backend enforces every scope; these tabs are only hidden from roles
+    // that could not use them.
+    const allMenuItems: ISettingsMenuBarProps[] = [
         {
             name: "General",
             page: <SettingsHome />,
@@ -49,29 +62,50 @@ export default function Config() {
             icon: Paintbrush,
         },
         {
+            name: "Storefronts",
+            page: <Storefronts />,
+            view: "storefronts",
+            icon: Store,
+            minRole: "manager",
+        },
+        {
             name: "Devices",
             page: <Devices />,
             view: "devices",
             icon: MonitorSmartphone,
+            minRole: "owner",
         },
-        // Owner-only; the backend enforces this, the tabs are just hidden.
-        ...(user?.role === "owner"
-            ? [
-                  {
-                      name: "Users",
-                      page: <Users />,
-                      view: "users",
-                      icon: UsersIcon,
-                  },
-                  {
-                      name: "Sign-in methods",
-                      page: <SignInMethods />,
-                      view: "sign-in",
-                      icon: KeyRound,
-                  },
-              ]
-            : []),
+        {
+            name: "Providers",
+            page: <Providers />,
+            view: "providers",
+            icon: Plug,
+            minRole: "owner",
+        },
+        {
+            name: "Users",
+            page: <Users />,
+            view: "users",
+            icon: UsersIcon,
+            minRole: "owner",
+        },
+        {
+            name: "Sign-in methods",
+            page: <SignInMethods />,
+            view: "sign-in",
+            icon: KeyRound,
+            minRole: "owner",
+        },
     ];
+
+    const menuItems = allMenuItems.filter((item) =>
+        meetsRole(user?.role, item.minRole),
+    );
+
+    // Resolving the page from the filtered list also blocks a restricted view
+    // that is still selected after the role changes.
+    const current = menuItems.find((item) => item.view === view);
+    const settingsPage = current ? current.page : menuItems[0]?.page;
 
     return (
         <div className={`flex flex-col`}>
@@ -110,7 +144,7 @@ export default function Config() {
                     <SettingsMenuBar menuItems={menuItems} />
                 </div>
                 <div className="flex flex-col">
-                    {settingsPage()}
+                    {settingsPage}
                     <PluginHost mount={PluginUIMountPoint.SETTINGS_TAB} />
                 </div>
             </div>
