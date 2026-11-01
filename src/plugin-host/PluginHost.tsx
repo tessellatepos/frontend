@@ -1,21 +1,14 @@
-import { useMemo } from "react";
-import {
-    PluginUIMountPoint,
-    type PluginUIMountDefinition,
-} from "@tessellatepos/plugin-sdk";
-import { usePluginStore } from "@/stores/plugins/pluginStore.ts";
+import type { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
 import { PluginErrorBoundary } from "./PluginErrorBoundary.tsx";
 import { PluginContextProvider } from "./PluginContextProvider.tsx";
+import { usePluginMounts } from "./usePluginMounts.ts";
 
 interface Props {
     mount: PluginUIMountPoint;
     /** Restrict to a single plugin (used by the PAGE mount point). */
     pluginName?: string;
-}
-
-interface ResolvedMount {
-    pluginName: string;
-    def: PluginUIMountDefinition;
+    /** Restrict to one registration, by `ResolvedMount.key`. */
+    entryKey?: string;
 }
 
 /**
@@ -24,29 +17,20 @@ interface ResolvedMount {
  * PluginContext scoped to its own name. Renders nothing when no
  * plugins are registered for the mount point.
  */
-export function PluginHost({ mount, pluginName }: Props) {
-    const { uiMounts, loaded } = usePluginStore();
-
-    const entries = useMemo<ResolvedMount[]>(() => {
-        if (!loaded) return [];
-        return Object.entries(uiMounts)
-            .filter(([name]) => !pluginName || name === pluginName)
-            .flatMap(([name, mounts]) =>
-                mounts
-                    .filter((m) => m.mount === mount)
-                    .map((def) => ({ pluginName: name, def })),
-            );
-    }, [uiMounts, loaded, mount, pluginName]);
+export function PluginHost({ mount, pluginName, entryKey }: Props) {
+    const entries = usePluginMounts(mount, pluginName).filter(
+        (entry) => !entryKey || entry.key === entryKey,
+    );
 
     if (entries.length === 0) return null;
 
     return (
         <>
-            {entries.map(({ pluginName: name, def }, index) => {
+            {entries.map(({ key, pluginName: name, def }) => {
                 const Component = def.component;
                 return (
                     <PluginErrorBoundary
-                        key={`${name}-${index}`}
+                        key={key}
                         pluginName={name}>
                         <PluginContextProvider pluginName={name}>
                             {(context) => <Component context={context} />}
