@@ -129,17 +129,20 @@ export default function Devices() {
                 <div
                     className={`flex-1 p-5 w-full flex-col rounded-2xl bg-gray-400 m-5`}>
                     <table className={`w-full border-spacing-2`}>
-                        <tr className={`text-left border-b-2 border-gray-300`}>
-                            <th>Device ID</th>
-                            <th>Device Created</th>
-                            <th>Device Pairing Code</th>
-                            <th>Device Pairing Started At</th>
-                            <th>Device Paired at</th>
-                            <th>Square Location</th>
-                            <th>Customer Facing</th>
-                            <th>Device Hardware ID</th>
-                            <th>Square Device ID</th>
-                        </tr>
+                        <thead>
+                            <tr
+                                className={`text-left border-b-2 border-gray-300`}>
+                                <th>Device ID</th>
+                                <th>Device Created</th>
+                                <th>Device Pairing Code</th>
+                                <th>Device Pairing Started At</th>
+                                <th>Device Paired at</th>
+                                <th>Square Location</th>
+                                <th>Customer Facing</th>
+                                <th>Device Hardware ID</th>
+                                <th>Square Device ID</th>
+                            </tr>
+                        </thead>
                         <tbody className={`w-full`}>
                             {deviceConfigs.map((config) => (
                                 <tr

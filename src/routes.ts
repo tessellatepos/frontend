@@ -7,13 +7,17 @@ export default [
     route("setup", "app/setup/page.tsx"),
     route("login", "app/login/page.tsx"),
     layout("app/require-auth.tsx", [
-        route("settings", "app/settings/page.tsx"),
+        layout("app/layout/AppLayout.tsx", [
+            route("dashboard", "app/dashboard/page.tsx"),
+            route("catalog", "app/catalog/page.tsx"),
+            route("settings", "app/settings/page.tsx"),
+            route("plugins/:pluginName", "app/plugin-page.tsx"),
+        ]),
         layout("app/storefront/layout.tsx", [
             route("storefront/:deviceId", "app/storefront/page.tsx"),
             route("storefront/cart", "app/storefront/cart/page.tsx"),
             route("storefront/receipt", "app/storefront/receipt/page.tsx"),
         ]),
-        route("plugins/:pluginName", "app/plugin-page.tsx"),
     ]),
     route("*?", "app/getting-started/page.tsx"),
 ] satisfies RouteConfig;
