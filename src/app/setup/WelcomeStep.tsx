@@ -42,7 +42,7 @@ export function WelcomeStep({
                     spellCheck={false}
                     required
                     error={error}
-                    hint='The setup token is printed in the server log the first time the backend starts (look for "setup token"), or it is the SETUP_TOKEN value set in the server&apos;s environment.'
+                    hint="The administrator set this token as SETUP_TOKEN in the server's environment."
                 />
             )}
             <button

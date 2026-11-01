@@ -1,4 +1,4 @@
-import { useSettingsStore } from "@/stores/settings/useSettingsStore";
+import { Navigate, useSearchParams } from "react-router";
 import Appearance from "@/app/settings/pages/appearance/page";
 import Devices from "@/app/settings/pages/devices/page";
 import SignInMethods from "@/app/settings/pages/sign-in/page";
@@ -6,6 +6,7 @@ import Users from "@/app/settings/pages/users/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
+import { isSettingsView } from "@/app/settings/tabs.ts";
 import {
     type ISettingsMenuBarProps,
     SettingsMenuBar,
@@ -20,34 +21,26 @@ import {
     Users as UsersIcon,
 } from "lucide-react";
 import { PluginUIMountPoint } from "@tessellatepos/plugin-sdk";
-import { type Role, useAuthStore } from "@/stores/auth/useAuthStore.ts";
-import { useNavigate } from "react-router";
+import { useAuthStore } from "@/stores/auth/useAuthStore.ts";
+import { meetsRole } from "@/utils/scopes.ts";
 import { PluginHost } from "@/plugin-host/PluginHost.tsx";
 
-/** Higher rank can open everything a lower rank can. */
-const ROLE_RANK: Record<Role, number> = {
-    viewer: 0,
-    cashier: 1,
-    manager: 2,
-    owner: 3,
-};
-
-/** Whether the signed-in role meets a tab's minimum; no role meets none. */
-function meetsRole(role: Role | null | undefined, minRole?: Role): boolean {
-    if (!minRole) return true;
-    if (!role) return false;
-    return ROLE_RANK[role] >= ROLE_RANK[minRole];
-}
-
 export default function Config() {
-    const { view } = useSettingsStore();
+    const [params] = useSearchParams();
     const user = useAuthStore((s) => s.user);
-    const signOut = useAuthStore((s) => s.signOut);
-    const signOutError = useAuthStore((s) => s.signOutError);
-    const navigate = useNavigate();
+    const tab = params.get("tab");
+
+    // Catalog is a sidebar work area now; old links to its tab still work.
+    if (tab === "catalog")
+        return (
+            <Navigate
+                to="/catalog"
+                replace
+            />
+        );
 
     // The backend enforces every scope; these tabs are only hidden from roles
-    // that could not use them.
+    // that could not use them. Administration only: Catalog is a sidebar page.
     const allMenuItems: ISettingsMenuBarProps[] = [
         {
             name: "General",
@@ -102,49 +95,27 @@ export default function Config() {
         meetsRole(user?.role, item.minRole),
     );
 
-    // Resolving the page from the filtered list also blocks a restricted view
-    // that is still selected after the role changes.
-    const current = menuItems.find((item) => item.view === view);
-    const settingsPage = current ? current.page : menuItems[0]?.page;
+    // An unknown or missing tab shows General. A restricted tab named in the
+    // URL falls back to the first tab the role may see.
+    const requested = isSettingsView(tab) ? tab : "general";
+    const current =
+        menuItems.find((item) => item.view === requested) ?? menuItems[0];
 
     return (
         <div className={`flex flex-col`}>
             <div
                 className={`flex w-full items-center justify-between py-5 pr-5`}>
                 <span className={`pl-5 text-4xl`}>Settings</span>
-                {user && (
-                    <div className={`flex items-center gap-3`}>
-                        <span className={`text-sm text-gray-500`}>
-                            {user.name}
-                        </span>
-                        <button
-                            className={`rounded border px-3 py-1`}
-                            onClick={() =>
-                                void signOut().then((done) => {
-                                    if (done)
-                                        void navigate("/login", {
-                                            replace: true,
-                                        });
-                                })
-                            }>
-                            Sign out
-                        </button>
-                        {signOutError && (
-                            <span
-                                role="alert"
-                                className={`text-sm text-red-600`}>
-                                {signOutError}
-                            </span>
-                        )}
-                    </div>
-                )}
             </div>
             <div className={`grid grid-cols-[2fr_7fr] w-full h-full`}>
                 <div className={`flex w-full`}>
-                    <SettingsMenuBar menuItems={menuItems} />
+                    <SettingsMenuBar
+                        menuItems={menuItems}
+                        activeView={current?.view}
+                    />
                 </div>
                 <div className="flex flex-col">
-                    {settingsPage}
+                    {current?.page}
                     <PluginHost mount={PluginUIMountPoint.SETTINGS_TAB} />
                 </div>
             </div>

@@ -6,6 +6,7 @@ import {
 } from "@/stores/auth/useAuthStore.ts";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
 import { getDeviceToken, getStoredDeviceId } from "@/utils/apiFetch.ts";
+import { roleHasScope } from "@/utils/scopes.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 
 /** `/`: send the visitor where their identity says they belong. */
@@ -13,6 +14,7 @@ export default function Home() {
     const status = useAuthStore((s) => s.status);
     const setupNeeded = useAuthStore((s) => s.setupNeeded);
     const wizard = useAuthStore(inSetupWizard);
+    const role = useAuthStore((s) => s.user?.role);
     const knownDeviceId = useSettingsStore((s) => s.deviceId);
 
     if (status === "unknown" || setupNeeded === null) {
@@ -29,14 +31,6 @@ export default function Home() {
                 replace
             />
         );
-    if (status === "signed-in")
-        return (
-            <Navigate
-                to={SIGNED_IN_HOME}
-                replace
-            />
-        );
-
     const deviceId = knownDeviceId || getStoredDeviceId();
     if (getDeviceToken() && deviceId) {
         return (
@@ -46,6 +40,17 @@ export default function Home() {
             />
         );
     }
+    if (status === "signed-in")
+        return (
+            <Navigate
+                to={
+                    roleHasScope(role, "dashboard:read")
+                        ? SIGNED_IN_HOME
+                        : "/settings"
+                }
+                replace
+            />
+        );
     return (
         <Navigate
             to="/login"

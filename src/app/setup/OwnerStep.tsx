@@ -57,7 +57,7 @@ export function OwnerStep({ token, onBadToken }: Props) {
             await refresh();
         } else if (result.status === 403) {
             onBadToken(
-                "That setup token is not correct. Check the server log.",
+                "That setup token is not correct. Use the SETUP_TOKEN set on the server.",
             );
         } else if (result.status === 409) {
             // SETUP_COMPLETE / USER_EXISTS: someone already set this up.

@@ -1,19 +1,9 @@
 import { create } from "zustand";
 import type { DeviceType } from "@tessellatepos/sdk";
 
-export type SettingsView =
-    | "general"
-    | "appearance"
-    | "devices"
-    | "users"
-    | "sign-in"
-    | "storefronts"
-    | "providers";
 export type DeviceView = "list" | "add" | "pair-terminal" | "add-local";
 
 interface SettingsState {
-    view: SettingsView;
-    setView: (view: SettingsView) => void;
     deviceView: DeviceView;
     setDeviceView: (view: DeviceView) => void;
     locationId: string;
@@ -37,8 +27,6 @@ function defaultBackendUrl(): string {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-    view: "general",
-    setView: (view) => set({ view }),
     deviceView: "list",
     setDeviceView: (deviceView) => set({ deviceView }),
     locationId: "",

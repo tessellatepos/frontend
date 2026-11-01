@@ -40,7 +40,7 @@ export default function Setup() {
             setPassedWelcome(true);
         } else if (result.status === 403) {
             setTokenError(
-                "That setup token is not correct. Check the server log.",
+                "That setup token is not correct. Use the SETUP_TOKEN set on the server.",
             );
         } else if (result.status === 409) {
             // SETUP_COMPLETE / USER_EXISTS: someone already set this up.
@@ -76,16 +76,21 @@ export default function Setup() {
 
     const storeDone =
         setup.provider === "square" ? setup.squareConnected : setup.steps.store;
+    // Welcome only holds the setup token, so it is skipped without one.
+    const welcomeShown = setup.setupTokenRequired;
     let step: number;
-    if (!setup.steps.owner) step = passedWelcome ? 1 : 0;
+    if (!setup.steps.owner) step = passedWelcome || !welcomeShown ? 1 : 0;
     else step = storeDone ? 3 : 2;
+    const progress = STEPS.map((label, i) => ({ label, i })).filter(
+        ({ i }) => i !== 0 || welcomeShown,
+    );
 
     return (
         <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 p-5">
             <ol
                 className="flex gap-2 text-sm"
                 aria-label="Setup progress">
-                {STEPS.map((label, i) => (
+                {progress.map(({ label, i }, n) => (
                     <li
                         key={label}
                         aria-current={i === step ? "step" : undefined}
@@ -96,7 +101,7 @@ export default function Setup() {
                                   ? "text-green-700"
                                   : "text-gray-500"
                         }>
-                        {i + 1}. {label}
+                        {n + 1}. {label}
                         {i < step ? " (done)" : ""}
                     </li>
                 ))}

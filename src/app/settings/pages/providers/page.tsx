@@ -2,17 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import type { ProviderId } from "@tessellatepos/sdk";
 import { apiFetch } from "@/utils/apiFetch.ts";
 import SquareConnection from "@/app/settings/pages/providers/squareConnection.tsx";
+import { PROVIDER_LABELS } from "@/app/settings/pages/providers/labels.ts";
 
 interface IProviderState {
     active: ProviderId;
     available: ProviderId[];
     syncError?: string;
 }
-
-const PROVIDER_LABELS: Record<ProviderId, string> = {
-    square: "Square",
-    local: "Local (cash only, for testing)",
-};
 
 export default function Providers() {
     const [state, setState] = useState<IProviderState>();

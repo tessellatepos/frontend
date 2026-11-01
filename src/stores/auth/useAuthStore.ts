@@ -44,8 +44,8 @@ interface AuthState {
     signOut: () => Promise<boolean>;
 }
 
-/** Where a signed-in user lands from `/`; the dashboard will replace this. */
-export const SIGNED_IN_HOME = "/settings";
+/** Where a signed-in user lands from `/`. */
+export const SIGNED_IN_HOME = "/dashboard";
 
 export const useAuthStore = create<AuthState>((set) => ({
     status: "unknown",

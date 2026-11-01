@@ -2,7 +2,7 @@
     "name": "@tessellatepos/frontend",
     "author": "Tessellate POS <tessellate@travisfriesen.ca>",
     "license": "AGPL-3.0-only",
-    "version": "0.1.0-dev",
+    "version": "0.0.2-alpha",
     "type": "module",
     "scripts": {
         "dev": "trap 'exit 0' INT TERM; react-router dev --host",
