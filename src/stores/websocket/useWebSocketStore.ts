@@ -39,8 +39,12 @@ export function useWebSocketConnection() {
     const { setConnected, setPaymentStatus } = useWebSocketStore();
 
     useEffect(() => {
-        // Derive the WebSocket URL from the backend HTTP URL.
-        const wsUrl = backendUrl.replace(/^http/, "ws");
+        // Same origin unless an absolute backend URL is configured; the
+        // socket always lives at /ws.
+        const base = new URL(backendUrl || window.location.origin);
+        base.protocol = base.protocol === "https:" ? "wss:" : "ws:";
+        base.pathname = "/ws";
+        const wsUrl = base.href;
 
         let ws: WebSocket | null = null;
         let reconnectTimer: ReturnType<typeof setTimeout> | undefined;

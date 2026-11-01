@@ -4,5 +4,5 @@ import { createAuthClient } from "better-auth/react";
 const { backendUrl } = useSettingsStore.getState();
 
 export const authClient = createAuthClient({
-    baseURL: backendUrl,
+    baseURL: backendUrl || undefined,
 });

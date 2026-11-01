@@ -17,14 +17,12 @@ interface SettingsState {
 }
 
 /**
- * Defaults the backend to wherever this page was loaded from (same host,
- * backend port) so the storefront works from a desktop browser, the Android
- * emulator's WebView (10.0.2.2), or a LAN device without per-device config.
+ * Empty means same-origin: requests use relative URLs and the host's reverse
+ * proxy (nginx, Caddy, or the Vite dev proxy) routes them to the backend. Set
+ * an absolute URL (e.g. for the mobile WebView) to talk to another origin.
  */
 function defaultBackendUrl(): string {
-    if (typeof window === "undefined") return "http://localhost:3000";
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:3000`;
+    return "";
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
