@@ -1,4 +1,5 @@
-FROM node:26-alpine AS builder
+# Output is static, so build natively and only the nginx stage varies per arch
+FROM --platform=$BUILDPLATFORM node:26-alpine AS builder
 RUN npm install -g pnpm@11.24.0
 WORKDIR /app
 
