@@ -3,6 +3,7 @@ import Appearance from "@/app/settings/pages/appearance/page";
 import Devices from "@/app/settings/pages/devices/page";
 import SignInMethods from "@/app/settings/pages/sign-in/page";
 import Users from "@/app/settings/pages/users/page";
+import Members from "@/app/settings/pages/members/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
 import ApiCredentials from "@/app/settings/pages/api-credentials/page";
@@ -17,6 +18,7 @@ import {
     CreditCard,
     KeyRound,
     Globe,
+    IdCard,
     MonitorSmartphone,
     Paintbrush,
     Plug,
@@ -88,6 +90,13 @@ export default function Config() {
             view: "users",
             icon: UsersIcon,
             minRole: "owner",
+        },
+        {
+            name: "Members",
+            page: <Members />,
+            view: "members",
+            icon: IdCard,
+            minRole: "manager",
         },
         {
             name: "Sign-in methods",

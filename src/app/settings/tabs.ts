@@ -9,6 +9,7 @@ export const SETTINGS_VIEWS = [
     "devices",
     "providers",
     "users",
+    "members",
     "sign-in",
     "api-credentials",
     "payments",
