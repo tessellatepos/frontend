@@ -3,10 +3,12 @@ import Appearance from "@/app/settings/pages/appearance/page";
 import Devices from "@/app/settings/pages/devices/page";
 import SignInMethods from "@/app/settings/pages/sign-in/page";
 import Users from "@/app/settings/pages/users/page";
+import Members from "@/app/settings/pages/members/page";
 import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
 import ApiCredentials from "@/app/settings/pages/api-credentials/page";
 import Payments from "@/app/settings/pages/payments/page";
+import Plugins from "@/app/settings/pages/plugins/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
 import { PLUGIN_VIEW_PREFIX, isSettingsView } from "@/app/settings/tabs.ts";
 import {
@@ -17,7 +19,9 @@ import {
     CreditCard,
     KeyRound,
     Globe,
+    IdCard,
     MonitorSmartphone,
+    Package,
     Paintbrush,
     Plug,
     Puzzle,
@@ -90,6 +94,13 @@ export default function Config() {
             minRole: "owner",
         },
         {
+            name: "Members",
+            page: <Members />,
+            view: "members",
+            icon: IdCard,
+            minRole: "manager",
+        },
+        {
             name: "Sign-in methods",
             page: <SignInMethods />,
             view: "sign-in",
@@ -108,6 +119,13 @@ export default function Config() {
             page: <Payments />,
             view: "payments",
             icon: CreditCard,
+            minRole: "owner",
+        },
+        {
+            name: "Plugins",
+            page: <Plugins />,
+            view: "plugins",
+            icon: Package,
             minRole: "owner",
         },
     ];

@@ -1,4 +1,5 @@
 import { apiFetch } from "@/utils/apiFetch.ts";
+import { uuid } from "@/utils/uuid.ts";
 import CartItem from "@/components/CartItem";
 import PaymentMethodPanel from "@/components/PaymentMethodPanel";
 import type { CartItem as CartItemType, Order } from "@tessellatepos/sdk";
@@ -57,7 +58,7 @@ export default function CartPage() {
             locationId,
             discounts,
             //TODO remove development reference/indempotency key
-            referenceId: crypto.randomUUID(),
+            referenceId: uuid(),
             source: {
                 name: `Tessellate POS - From Device:${deviceId}`,
             },

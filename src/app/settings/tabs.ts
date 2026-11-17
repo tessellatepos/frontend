@@ -9,9 +9,11 @@ export const SETTINGS_VIEWS = [
     "devices",
     "providers",
     "users",
+    "members",
     "sign-in",
     "api-credentials",
     "payments",
+    "plugins",
 ] as const;
 
 export type SettingsView = (typeof SETTINGS_VIEWS)[number];

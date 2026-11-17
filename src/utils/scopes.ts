@@ -18,6 +18,8 @@ const ROLE_SCOPES: Record<Role, readonly string[]> = {
         "devices:read",
         "devices:write",
         "users:read",
+        "members:read",
+        "members:write",
         "dashboard:read",
         "settings:read",
         "payments:read",
