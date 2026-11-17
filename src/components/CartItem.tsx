@@ -7,9 +7,21 @@ import {
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { convertCentsToDollars } from "@tessellatepos/sdk";
+import {
+    convertCentsToDollars,
+    convertDollarsToCents,
+} from "@tessellatepos/sdk";
 import type { CartItem as CartItemType } from "@tessellatepos/sdk";
+import { useState } from "react";
 import { useCartStore } from "@/stores/cart/useCartStore.ts";
 
 type Props = {
@@ -19,7 +31,45 @@ type Props = {
 };
 
 export default function CartItem({ item, editable = true }: Props) {
-    const { removeQuantity, removeItem, addQuantity } = useCartStore();
+    const { removeQuantity, removeItem, addQuantity, setItemPrice } =
+        useCartStore();
+    const [priceOpen, setPriceOpen] = useState(false);
+    const [priceInput, setPriceInput] = useState("");
+    const [priceError, setPriceError] = useState(false);
+
+    const titleText = item.name || item.parent?.name || "item";
+
+    const openPriceEditor = () => {
+        setPriceInput(
+            item.priceMoney?.amount != null
+                ? convertCentsToDollars(item.priceMoney.amount)
+                : "",
+        );
+        setPriceError(false);
+        setPriceOpen(true);
+    };
+
+    const confirmPrice = () => {
+        const cents = convertDollarsToCents(priceInput);
+        if (cents === null) {
+            setPriceError(true);
+            return;
+        }
+        setItemPrice(item, {
+            amount: cents,
+            // TODO: pull default currency from settings instead of hardcoding
+            currency: item.priceMoney?.currency ?? "CAD",
+        });
+        setPriceOpen(false);
+    };
+
+    const priceLabel = item.priceMoney?.amount ? (
+        <>
+            ${convertCentsToDollars(item.priceMoney.amount)} -{" "}
+        </>
+    ) : (
+        "Price varies"
+    );
 
     return (
         <div className="flex w-full">
@@ -33,20 +83,20 @@ export default function CartItem({ item, editable = true }: Props) {
                             <div
                                 className={`flex flex-row justify-start items-start`}>
                                 <ItemTitle className="text-xl">
-                                    {item.priceMoney?.amount ? (
-                                        <>
-                                            $
-                                            {convertCentsToDollars(
-                                                item.priceMoney.amount,
-                                            )}{" "}
-                                            -{"\u00A0"}
-                                        </>
+                                    {editable ? (
+                                        <button
+                                            type="button"
+                                            onClick={openPriceEditor}
+                                            aria-label={`Edit price for ${titleText}`}
+                                            className="underline decoration-dotted underline-offset-4 hover:opacity-70">
+                                            {priceLabel}
+                                        </button>
                                     ) : (
-                                        "Price varies"
+                                        priceLabel
                                     )}
                                 </ItemTitle>
                                 <ItemTitle className="text-xl">
-                                    {item.parent?.name}
+                                    {item.parent?.name ?? item.name}
                                 </ItemTitle>
                             </div>
                             <div>
@@ -96,6 +146,40 @@ export default function CartItem({ item, editable = true }: Props) {
                     </div>
                 </ItemContent>
             </Item>
+            {editable && (
+                <Dialog
+                    open={priceOpen}
+                    onOpenChange={setPriceOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Edit price for {titleText}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0.00"
+                            value={priceInput}
+                            onChange={(e) => {
+                                setPriceInput(e.target.value);
+                                setPriceError(false);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") confirmPrice();
+                            }}
+                        />
+                        {priceError && (
+                            <p className="text-sm text-destructive">
+                                Enter a valid price, e.g. 4.99
+                            </p>
+                        )}
+                        <DialogFooter>
+                            <Button onClick={confirmPrice}>Save price</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 }
