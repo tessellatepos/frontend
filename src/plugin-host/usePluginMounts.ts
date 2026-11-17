@@ -12,10 +12,16 @@ export interface ResolvedMount {
     def: PluginUIMountDefinition;
 }
 
-/** Every loaded plugin registration for a mount point. */
+const normalizePath = (p?: string) => (p ?? "").replace(/^\/+|\/+$/g, "");
+
+/**
+ * Every loaded plugin registration for a mount point. `path` (PAGE mounts)
+ * keeps only registrations whose `def.path` matches; "" is the index page.
+ */
 export function usePluginMounts(
     mount: PluginUIMountPoint,
     pluginName?: string,
+    path?: string,
 ): ResolvedMount[] {
     const { uiMounts, loaded } = usePluginStore();
 
@@ -30,7 +36,12 @@ export function usePluginMounts(
                         pluginName: name,
                         def,
                     }))
-                    .filter(({ def }) => def.mount === mount),
+                    .filter(({ def }) => def.mount === mount)
+                    .filter(
+                        ({ def }) =>
+                            path === undefined ||
+                            normalizePath(def.path) === normalizePath(path),
+                    ),
             );
-    }, [uiMounts, loaded, mount, pluginName]);
+    }, [uiMounts, loaded, mount, pluginName, path]);
 }
