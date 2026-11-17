@@ -53,12 +53,12 @@ export default function Storefront() {
 
             // A LOCAL till has no hardware, so the payment panel offers cash
             // only for it.
-            setDeviceType(deviceConfig.device_type ?? "");
+            setDeviceType(deviceConfig.deviceType ?? "");
 
             // Devices may not pin a location. Fall back to the location of
             // the deployment's Square connection, if it has one, then to the
             // only location when there's just one.
-            let location = deviceConfig.square_location;
+            let location = deviceConfig.squareLocation;
             if (!location) {
                 const statusResponse = await apiFetch(
                     `/api/v1/square/oauth/status`,

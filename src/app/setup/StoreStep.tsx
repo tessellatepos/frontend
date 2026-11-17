@@ -33,8 +33,8 @@ type AddressKey = Exclude<keyof Address, "country">;
 
 /** Maps an sdk AddressField to the Address key(s) it fills. */
 function keysFor(field: AddressField): AddressKey[] {
-    return field === "address_lines"
-        ? ["address_line_1", "address_line_2"]
+    return field === "addressLines"
+        ? ["addressLine1", "addressLine2"]
         : [field];
 }
 
@@ -80,9 +80,9 @@ export function StoreStep() {
                 return "Contact name";
             case "organization":
                 return "Organization";
-            case "address_lines":
+            case "addressLines":
                 return "Address";
-            case "dependent_locality":
+            case "dependentLocality":
                 return meta.dependentLocalityType
                     ? DEPENDENT_LOCALITY_LABELS[meta.dependentLocalityType]
                     : "Neighborhood";
@@ -94,23 +94,23 @@ export function StoreStep() {
                 return meta.subdivisionType
                     ? SUBDIVISION_LABELS[meta.subdivisionType]
                     : "Region";
-            case "postal_code":
+            case "postalCode":
                 return meta.postalCodeType
                     ? POSTAL_CODE_LABELS[meta.postalCodeType]
                     : "Postal code";
-            case "sorting_code":
+            case "sortingCode":
                 return "Sorting code";
         }
     }
 
     function buildAddress(): Address {
-        const address: Address = { country, address_line_1: "" };
+        const address: Address = { country, addressLine1: "" };
         for (const [key, value] of Object.entries(values)) {
             const trimmed = value?.trim();
             if (trimmed)
                 (address as unknown as Record<string, string>)[key] = trimmed;
         }
-        address.address_line_1 ??= "";
+        address.addressLine1 ??= "";
         return address;
     }
 
@@ -154,11 +154,11 @@ export function StoreStep() {
     const input = (key: AddressKey, field: AddressField, extra = {}) => (
         <FormField
             key={key}
-            label={key === "address_line_2" ? "Address line 2" : label(field)}
+            label={key === "addressLine2" ? "Address line 2" : label(field)}
             value={values[key] ?? ""}
             onChange={(e) => setValues({ ...values, [key]: e.target.value })}
-            error={key === "address_line_2" ? undefined : fieldErrors[field]}
-            required={meta.required.includes(field) && key !== "address_line_2"}
+            error={key === "addressLine2" ? undefined : fieldErrors[field]}
+            required={meta.required.includes(field) && key !== "addressLine2"}
             {...extra}
         />
     );
