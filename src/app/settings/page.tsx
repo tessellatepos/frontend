@@ -8,6 +8,7 @@ import SettingsHome from "@/app/settings/pages/general/page";
 import Providers from "@/app/settings/pages/providers/page";
 import ApiCredentials from "@/app/settings/pages/api-credentials/page";
 import Payments from "@/app/settings/pages/payments/page";
+import Plugins from "@/app/settings/pages/plugins/page";
 import Storefronts from "@/app/settings/pages/storefronts/page";
 import { PLUGIN_VIEW_PREFIX, isSettingsView } from "@/app/settings/tabs.ts";
 import {
@@ -20,6 +21,7 @@ import {
     Globe,
     IdCard,
     MonitorSmartphone,
+    Package,
     Paintbrush,
     Plug,
     Puzzle,
@@ -117,6 +119,13 @@ export default function Config() {
             page: <Payments />,
             view: "payments",
             icon: CreditCard,
+            minRole: "owner",
+        },
+        {
+            name: "Plugins",
+            page: <Plugins />,
+            view: "plugins",
+            icon: Package,
             minRole: "owner",
         },
     ];

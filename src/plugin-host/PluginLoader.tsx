@@ -7,7 +7,10 @@ import * as pluginSdk from "@tessellatepos/plugin-sdk";
 import { FrontendPlugin, type PluginManifest } from "@tessellatepos/plugin-sdk";
 import { exposeSharedModules } from "@tessellatepos/plugin-sdk/host";
 import { useSettingsStore } from "@/stores/settings/useSettingsStore.ts";
-import { usePluginStore } from "@/stores/plugins/pluginStore.ts";
+import {
+    type DiscoveredPlugin,
+    usePluginStore,
+} from "@/stores/plugins/pluginStore.ts";
 import { Logger } from "tslog";
 
 const logger = new Logger();
@@ -26,11 +29,7 @@ interface PluginClientModule {
 }
 
 interface DiscoveredPluginResponse {
-    plugins: {
-        name: string;
-        version: string;
-        clientEntryUrl: string | null;
-    }[];
+    plugins: DiscoveredPlugin[];
 }
 
 /**
@@ -42,7 +41,7 @@ interface DiscoveredPluginResponse {
  */
 export function PluginLoader({ children }: { children: ReactNode }) {
     const { backendUrl } = useSettingsStore();
-    const { setPlugins, setUiMounts, setLoaded } = usePluginStore();
+    const { setPlugins, setUiMounts, setStatus, setLoaded } = usePluginStore();
 
     useEffect(() => {
         async function discover() {
@@ -60,6 +59,10 @@ export function PluginLoader({ children }: { children: ReactNode }) {
                 // Import each plugin's client bundle and collect UI mounts.
                 // Errors are caught per-plugin so one failure doesn't block
                 // the others.
+                data.plugins
+                    .filter((p) => !p.clientEntryUrl)
+                    .forEach((p) => setStatus(p.name, "server-only"));
+
                 await Promise.all(
                     data.plugins
                         .filter((p) => p.clientEntryUrl)
@@ -96,10 +99,18 @@ export function PluginLoader({ children }: { children: ReactNode }) {
                                 await module.default(frontendPlugin);
 
                                 setUiMounts(p.name, frontendPlugin.get("ui"));
+                                setStatus(p.name, "loaded");
                             } catch (err) {
                                 logger.error(
                                     `Failed to load plugin client bundle "${p.name}":`,
                                     err,
+                                );
+                                setStatus(
+                                    p.name,
+                                    "failed",
+                                    err instanceof Error
+                                        ? err.message
+                                        : String(err),
                                 );
                             }
                         }),

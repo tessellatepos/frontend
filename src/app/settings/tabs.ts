@@ -13,6 +13,7 @@ export const SETTINGS_VIEWS = [
     "sign-in",
     "api-credentials",
     "payments",
+    "plugins",
 ] as const;
 
 export type SettingsView = (typeof SETTINGS_VIEWS)[number];
