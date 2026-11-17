@@ -64,7 +64,7 @@ export default function Devices() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         ...device,
-                        square_location: locationId || null,
+                        squareLocation: locationId || null,
                     }),
                 },
             );
@@ -151,7 +151,7 @@ export default function Devices() {
                                     key={config.id}>
                                     <td className={`py-2`}>
                                         {config.id}
-                                        {config.device_type === "LOCAL" && (
+                                        {config.deviceType === "LOCAL" && (
                                             <span
                                                 className={`ml-2 text-xs bg-green-600 text-white rounded px-2 py-0.5`}>
                                                 Local
@@ -160,32 +160,32 @@ export default function Devices() {
                                     </td>
                                     <td>
                                         {new Date(
-                                            config.created_at,
+                                            config.createdAt,
                                         ).toLocaleString()}
                                     </td>
                                     {/* A LOCAL till has no pairing code. */}
                                     <td>
-                                        {config.device_type === "LOCAL"
+                                        {config.deviceType === "LOCAL"
                                             ? "None (local till)"
-                                            : config.pairing_code}
+                                            : config.pairingCode}
                                     </td>
                                     <td>
-                                        {config.code_created_at
+                                        {config.codeCreatedAt
                                             ? new Date(
-                                                  config.code_created_at,
+                                                  config.codeCreatedAt,
                                               ).toLocaleString()
                                             : "—"}
                                     </td>
                                     <td>
-                                        {config.paired_at
+                                        {config.pairedAt
                                             ? new Date(
-                                                  config.paired_at,
+                                                  config.pairedAt,
                                               ).toLocaleString()
                                             : "Not paired yet"}
                                     </td>
                                     <td>
                                         <select
-                                            value={config.square_location ?? ""}
+                                            value={config.squareLocation ?? ""}
                                             onChange={(e) =>
                                                 void setDeviceLocation(
                                                     config,
@@ -205,14 +205,14 @@ export default function Devices() {
                                         </select>
                                     </td>
                                     <td>
-                                        {config.customer_facing ? "Yes" : "No"}
+                                        {config.customerFacing ? "Yes" : "No"}
                                     </td>
-                                    <td>{config.device_hardware_id}</td>
+                                    <td>{config.deviceHardwareId}</td>
                                     <td>
-                                        {config.device_type === "LOCAL"
+                                        {config.deviceType === "LOCAL"
                                             ? "Not applicable"
-                                            : (config.square_device_id ??
-                                              (config.square_device_code_id
+                                            : (config.squareDeviceId ??
+                                              (config.squareDeviceCodeId
                                                   ? "Pairing..."
                                                   : "Not paired"))}
                                     </td>

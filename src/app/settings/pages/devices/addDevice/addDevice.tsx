@@ -43,7 +43,7 @@ export default function AddDevice() {
     }, []);
 
     // The mobile app completes pairing by hitting PUT /pair-device/:code on
-    // the backend. Poll this device until paired_at is set, then close the
+    // the backend. Poll this device until pairedAt is set, then close the
     // pairing window automatically.
     useEffect(() => {
         if (!deviceConfig?.id) return;
@@ -55,7 +55,7 @@ export default function AddDevice() {
                 );
                 if (!response.ok) return;
                 const config: IConfigDevice | null = await response.json();
-                if (config?.paired_at) {
+                if (config?.pairedAt) {
                     clearInterval(poll);
                     setDeviceView("list");
                 }
@@ -78,7 +78,7 @@ export default function AddDevice() {
             </div>
             <div>
                 <h1>{deviceConfig?.id}</h1>
-                <h1>{deviceConfig?.pairing_code}</h1>
+                <h1>{deviceConfig?.pairingCode}</h1>
             </div>
         </div>
     );
