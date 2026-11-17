@@ -1,3 +1,4 @@
+import { uuid } from "@/utils/uuid.ts";
 import {
     convertCentsToDollars,
     convertDollarsToCents,
@@ -48,7 +49,7 @@ const MAX_AMOUNT = 999_999_999_999n;
 
 export function newVariation(): VariationForm {
     return {
-        key: crypto.randomUUID(),
+        key: uuid(),
         name: "",
         sku: "",
         upc: "",
@@ -94,7 +95,7 @@ export function formFromItem(item: Item, fallbackCurrency: string): ItemForm {
         ),
         locationIds: item.locationIds ?? [],
         variations: variations.map((v) => ({
-            key: crypto.randomUUID(),
+            key: uuid(),
             id: v.id ?? v.itemId ?? undefined,
             name: v.name ?? "",
             sku: v.sku ?? "",
