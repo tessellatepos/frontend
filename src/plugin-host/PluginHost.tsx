@@ -7,6 +7,8 @@ interface Props {
     mount: PluginUIMountPoint;
     /** Restrict to a single plugin (used by the PAGE mount point). */
     pluginName?: string;
+    /** Restrict PAGE mounts to the one registered at this sub-path. */
+    path?: string;
     /** Restrict to one registration, by `ResolvedMount.key`. */
     entryKey?: string;
 }
@@ -17,8 +19,8 @@ interface Props {
  * PluginContext scoped to its own name. Renders nothing when no
  * plugins are registered for the mount point.
  */
-export function PluginHost({ mount, pluginName, entryKey }: Props) {
-    const entries = usePluginMounts(mount, pluginName).filter(
+export function PluginHost({ mount, pluginName, path, entryKey }: Props) {
+    const entries = usePluginMounts(mount, pluginName, path).filter(
         (entry) => !entryKey || entry.key === entryKey,
     );
 

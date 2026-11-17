@@ -13,7 +13,7 @@ export default [
             route("orders", "app/orders/page.tsx"),
             route("orders/:orderId", "app/orders/detail.tsx"),
             route("settings", "app/settings/page.tsx"),
-            route("plugins/:pluginName", "app/plugin-page.tsx"),
+            route("plugins/:pluginName/*?", "app/plugin-page.tsx"),
         ]),
         layout("app/storefront/layout.tsx", [
             route("storefront/:deviceId", "app/storefront/page.tsx"),

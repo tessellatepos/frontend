@@ -8,7 +8,7 @@ import { PluginHost } from "@/plugin-host/PluginHost.tsx";
  * Renders only the plugin specified by the :pluginName route param.
  */
 export default function PluginPage() {
-    const { pluginName } = useParams();
+    const { pluginName, "*": path = "" } = useParams();
 
     if (!pluginName) return null;
 
@@ -17,6 +17,7 @@ export default function PluginPage() {
             <PluginHost
                 mount={PluginUIMountPoint.PAGE}
                 pluginName={pluginName}
+                path={path}
             />
         </div>
     );
